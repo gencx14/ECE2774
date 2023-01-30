@@ -1,0 +1,18 @@
+1. 	What is Git and what does it do?
+    A: Git is a version control software. It allows you to save each time you make a change and go back into change history.
+2.	How is Github different from Git?
+    A: Github is a collaboration website that interacts with Git and works with it on your projects. Github is used to interact with Git.
+3.	What is a branch? Why is it useful?
+    A: A branch is an exact replica of master except as a safe sandbox to make changes without effecting the master.
+    branch --> commits --> Pull Request --> Collaborate --> Merge
+4.	What is a commit?
+    A: Commits are kind of like making changes that are stored by taking a snapshot of your repo at that certain time.
+5.	What is a pull request?
+    A: After making a commit you open a pull request. Here you compare the branch you made with another branch. Here you compare the changes and can collaborate on these changes. Once you reach a final copy you can merge your branch.
+6.	What is a fork? How would you find this to be useful?
+    A: A fork is used if you want to work on a project that you don't have collaborator access to. When you create a fork you create a copy of a repository on your own account that is a copy of the original repository. You can make changes and commit them but they will not be available to the source repository. From your fork you can open a pull request from your fork into the original repository owned by someone else. It is useful on opensource repositories.
+7.	How do you clone a repository
+    A: You have to work locally on your own machine. You can do it one github.com, IDE, or command prompt. Your changes only happen on your local repository, and then you can push them to the remote repository. A command to do this is git clone https://github.com/username/repository
+8.	How do you resolve merge conflicts?
+    A: It occurs when there is the same file in the same line in the files you are trying to merge.
+        You should then run git status-, open your text editor, look for merge conflict markers, pick the code you want to keep, then delete the other one and delete the merge conflict markers. Save and then commit them and git will know the merge conflict has resolved.
