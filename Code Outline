@@ -1,17 +1,49 @@
 Code Outline for Milestone 1
 
 Classes:
-  Transformer
-  TransmissionLine
-  Bus
-  Generator
+- Transformer
+- TransformerData
+- TransmissionLine
+- TransmissionLineData
+- Bus
+- Generator
+- Network
+- Solution
   
-Transformer: What data/functions should a transformer class have
-  Primary Voltage
-  Secondary Voltage
-  Bus Connection 1
-  Bus Connection 2
-  Impedance
+Transformer: 
+- takes TransfromerData object as input
+- contains bus connections
+- contains impedance value
+- contains primary/secondary voltages?
   
-TransmissionLine: What data should a transmission line class store, do we want to do 
+ TransformerData: Preform necessary calculations for transformer class
+ - 
   
+  
+TransmissionLineData: Preforms calculations for Transmission Line class, to be passed in as an object
+- Should take in the radius, number of conductors, coordinates of conductors, other data about the line to calculate impedance/length. 
+- 
+
+TransmissionLine: 
+- Takes TransmissionLineData object as input
+- Bus connection 1
+  should this check a list and then create a new bus if necessary
+- Bus connection 2
+  should this check a list and then create a new bus if necessary
+- Length of line
+  will be used to multiply with the values brought in from the TransmissionLineData object
+- Impedance
+  
+Bus:
+- Functions similar to Bus class from Simple Circuit code
+  
+Network:
+- Dictionaries of each component
+- Add functionality for each component
+  creates new object of target class
+  should append the related dictionary with the new item
+  
+ Solution:
+ - takes Network object as input, similar to simple circuit code
+ - solves for voltages on bus
+ - power drawn from generators
