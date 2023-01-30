@@ -9,6 +9,8 @@ solution_obj = Solution(circuitObject)
 solution_obj.do_power_flow()
 solution_obj.print_nodal_voltages()
 
+print("Nick said this line should be deleted because it is just a test.")
+
 
 
 
