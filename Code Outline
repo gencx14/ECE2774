@@ -13,5 +13,11 @@ Transformer: What data/functions should a transformer class have
   Bus Connection 2
   Impedance
   
-TransmissionLine: What data should a transmission line class store, do we want to do 
+TransmissionLine: What data should a transmission line class store, do we want to do calculations for the lines in this class, or make a separate class and bring the data over
+  Number in bundle
+  Radius of conductor
+  Distance between conductors
+  Bus connection 1
+  Bus connection 2
+  
   
