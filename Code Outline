@@ -1,0 +1,17 @@
+Code Outline for Milestone 1
+
+Classes:
+  Transformer
+  TransmissionLine
+  Bus
+  Generator
+  
+Transformer: What data/functions should a transformer class have
+  Primary Voltage
+  Secondary Voltage
+  Bus Connection 1
+  Bus Connection 2
+  Impedance
+  
+TransmissionLine: What data should a transmission line class store, do we want to do 
+  
