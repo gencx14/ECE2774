@@ -1,4 +1,3 @@
 class TransmissionLineData:
-    pass
 
-    # def __init__(self, number, spacing, ):
+    def __init__(self, bundle_num,  ):
