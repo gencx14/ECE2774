@@ -3,7 +3,8 @@ import math
 
 class Geometry:
 
-    def __init__(self, x1, y1, x2, y2, x3, y3):
+    def __init__(self, name, x1, y1, x2, y2, x3, y3):
+        self.name = name
         self.Dab_x = abs(x1-x2)
         self.Dab_y = abs(y1-y2)
         self.Dbc_x = abs(x2 - x3)
