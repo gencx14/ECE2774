@@ -10,7 +10,8 @@ class TransmissionLine:
     y_rated = 1/z_rated     # admittance base
     j = math.sqrt(-1)
 
-    def __init__(self, bus1, bus2, length, data: TransmissionLineData):
+    def __init__(self, name, bus1, bus2, length, data: TransmissionLineData):
+        self.name = name
         self.data = data
         self.bus1 = bus1
         self.bus2 = bus2
