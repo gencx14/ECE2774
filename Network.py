@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List
 from TransmissionLineData import TransmissionLineData
 from TransformerData import TransformerData
 from TransmissionLine import TransmissionLine
@@ -30,11 +30,11 @@ class Network:
         if name not in self.geometries.keys():
             self.geometries[name] = Geometry(name, x1, y1, x2, y2, x3, y3)
 
-    def add_transmissionline_type(self, name, bundle_num, line_geometry: Geometry, gmr, diam, d, rac):
+    def add_transmission_line_type(self, name, bundle_num, line_geometry: Geometry, gmr, diam, d, rac):
         if name not in self.line_data.keys():
             self.line_data[name] = TransmissionLineData(name, bundle_num, line_geometry, gmr, diam, d, rac)
 
-    def add_transmissionline(self, name, bus1, bus2, length, data: TransmissionLineData):
+    def add_transmission_line(self, name, bus1, bus2, length, data: TransmissionLineData):
         if name not in self.lines.keys():
             self.lines[name] = TransmissionLine(name, bus1, bus2, length, data)
             self.add_bus(bus1)
@@ -54,4 +54,3 @@ class Network:
         if name not in self.generators.keys():
             self.generators[name] = Generator(name, voltage, bus1)
             self.add_bus(bus1)
-            
