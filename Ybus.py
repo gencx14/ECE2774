@@ -2,4 +2,11 @@ from Network import Network
 
 
 class Ybus:
-    pass
+
+    def __init__(self, name, network: Network):
+        self.network = network
+        self.name = name
+
+        
+
+
