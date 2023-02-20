@@ -11,7 +11,6 @@ from Bus import Bus
 class Network:
     def __init__(self, name: str):
         self.name: str = name
-
         self.buses_order: List[str] = list()    # stores names of buses
         self.buses: Dict[str, Bus] = dict()     # stores buses with their data
         self.line_data: Dict[str, TransmissionLineData] = dict()     # stores types of transmission line data
@@ -20,6 +19,7 @@ class Network:
         self.transformer_data: Dict[str, TransformerData] = dict()
         self.transformers: Dict[str, Transformer] = dict()      # stores transformers and their data
         self.generators: Dict[str, Generator] = dict()      # stores generators and their data
+        self.n = len(self.buses_order)      # n = number of buses in the network
 
     def add_bus(self, bus_name):
         if bus_name not in self.buses.keys():
