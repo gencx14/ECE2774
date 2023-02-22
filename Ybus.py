@@ -11,7 +11,7 @@ class Ybus:
         # n is the number of buses in the network
 
     def fill_ybus_matrix(self):         # fills values of Ybus matrix with necessary values
-        self.Y_matrix[0][0] = self.network.transformers['T1'].y
+        self.Y_matrix[0][0] = str(self.network.transformers['T1'].y)
         self.Y_matrix[0][1] = - self.network.transformers['T1'].y
         self.Y_matrix[1][0] = self.Y_matrix[1][0]
         self.Y_matrix[1][1] = self.network.transformers['T1'].y + self.network.lines['L1'].y + self.network.lines['L2'].y

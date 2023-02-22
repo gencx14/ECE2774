@@ -4,7 +4,7 @@ import math
 
 class Transformer:
 
-    j = complex(0, -1)
+    #j = math.sqrt(-1)
 
     def __init__(self, name: str, data: TransformerData, bus1, bus2):
         self.name = name

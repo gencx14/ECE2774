@@ -25,7 +25,6 @@ class Network:
         if bus_name not in self.buses.keys():
             self.buses[bus_name] = Bus(bus_name)
             self.buses_order.append(bus_name)
-            self.n = len(self.buses_order)  # n = number of buses in the network
 
     def add_geometry(self, name, x1, y1, x2, y2, x3, y3):      # put positions in array, pass array, cuts down on inputs
         if name not in self.geometries.keys():
