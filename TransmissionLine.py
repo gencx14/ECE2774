@@ -8,7 +8,7 @@ class TransmissionLine:
     v_base = 230       # voltage base is 230kV
     z_rated = v_base**2/p_base    # impedance base
     y_rated = 1/z_rated     # admittance base
-    j = math.sqrt(-1)
+    j = complex(0, -1)
 
     def __init__(self, name, bus1, bus2, length, data: TransmissionLineData):
         self.name = name
