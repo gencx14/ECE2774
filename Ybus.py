@@ -37,4 +37,3 @@ class Ybus:
 
     def print_ybus_matrix(self):        # outputs the values in the Ybus matrix
         print(self.Y_matrix)
-        print(self.network.lines['L1'].B)
