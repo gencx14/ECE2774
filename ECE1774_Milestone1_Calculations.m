@@ -11,12 +11,12 @@ j = sqrt(-1);
 
 
         %   Input Values
-Line_Name = 'Partridge';
+Line_Name = 'Partridge, L6';
 Dab = (18/12) + 18;     % Dab in feet - these distances are for 3 points in a line (. . .)
 Dbc = (18/12) + 18;     % Dbc in feet
 Dca = Dab + Dbc;        % Dca in feet
 GMR = 0.0217;           % From data sheet, in feet
-length = 10;            % Length of wire in miles
+length = 35;            % Length of wire in miles
 n = 2;                  % Number of conductors per bundle
 diam = 0.642;           % Diameter of conductor in inches
 r = diam/2/12;          % Radius of conductor in feet
@@ -24,6 +24,9 @@ d = 1.5;                % Distance between conductors in a bundle in feet, set t
 Rac = 0.385;            % Ohms/mile - datasheet
 f = 60;                 % Frequency in Hertz
 w = 2 * pi * f;         % Frequency in rad/s
+Vbase = 230;            % Voltage base in kV
+Sbase = 100;            % Power base in MVA
+Zbase = Vbase^2 / Sbase;    % Impedance base
 
 
 
@@ -48,9 +51,9 @@ L_prime = 2*10^-7 * log(Deq/Dsl);   % Inductance in H/m
 C_prime = 2*pi*eo/log(Deq/Dsc);     % Capacitance in F/m 
 
 X_prime = w * L_prime;              % Reactance in Ohms/m
-Y_prime = j * w * C_prime;    % Shunt admittance in S/m
+Y_prime =j * w * C_prime;    % Shunt admittance in S/m
 
-R = R_prime * 1609.34 * length;       % Series resistance in Ohms
+R = R_prime * length;       % Series resistance in Ohms
 X = X_prime * 1609.34 * length;       % Series reactance in Ohms
 Y_shunt = Y_prime * 1609.34 * length; % Shunt admittance in S
 
@@ -59,3 +62,5 @@ disp(['For the ', num2str(length), ' mile long, transposed, ', num2str(n),'-cond
 disp(['The series resistance R = ', num2str(R), ' Ohms'])
 disp(['The series reactance X = ', num2str(X), ' Ohms'])
 disp(['The shunt admittance Y = ', num2str(Y_shunt), ' S'])
+Zpu = (R+(j*X)) / Zbase
+Ypu = (Y_shunt / (1/Zbase))
