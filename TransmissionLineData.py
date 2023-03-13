@@ -34,7 +34,7 @@ class TransmissionLineData:
                 self.DSC = 1.0941 * math.sqrt(math.sqrt(self.d**3 * self.r))
 
         self.C_prime = 2 * math.pi * (8.854*10**-12) / math.log(self.Deq/self.DSC)      # in F/m
-        self.L_prime = 2 * 10**-7 * math.log10(self.Deq/self.DSL)                       # in H/m
+        self.L_prime = 2 * (10 ** -7) * math.log(self.Deq/self.DSL)                       # in H/m
 
         self.C = self.C_prime * 1609        # in F/mile
         self.L = self.L_prime * 1609        # in H/mile
