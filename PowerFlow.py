@@ -1,4 +1,5 @@
 import numpy as np
+import cmath as cmath
 from Ybus import Ybus
 
 class PowerFlow:
@@ -20,10 +21,18 @@ class PowerFlow:
         k = 0
         while k < 6:
             # summation for Pk
-            # then iterate K
+            n = 0
+            while n < 6:
+                self.f_x[k] = self.x[6+k] * abs(self.ybus.Y_matrix[k][n]) * self.x[6+n] * cmath.cos(self.x[k] - self.x[n] - cmath.phase(self.ybus.Y_matrix[k][n]))
+                n = n + 1
+            k = k + 1       # at the end of this set of while loops, k should be 6
             # new while loop to fill Qk
+        while k < 11
             # summation for Qk
-            # iterate K
+            n = 0
+            while n < 6:
+                self.f_x[k] = self.x[]
+
         # function ends with Pk and Qk values populated
 
 
