@@ -8,6 +8,13 @@ class Bus:
 
         self.index = Bus.count
         self.voltage = None
+        self.bustype = None
+        self.delta = None
+        self.P = None
+        self.Q = None
 
     def set_bus_voltage(self, voltage):     # function to set voltage of a bus
         self.voltage = voltage
+
+    def set_bus_type(self, bustype: str):   # sets the type of bus for power flow
+        self.bustype = bustype

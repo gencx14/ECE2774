@@ -1,7 +1,7 @@
 import numpy as np
 from Ybus import Ybus
 
-class Jacobian:
+class PowerFlow:
 
     def __init__(self, ybus: Ybus):
         # bringing in previously calculated admittance matrix
@@ -15,11 +15,11 @@ class Jacobian:
         # matrix of bus deltas and bus Vs except for generator bus V as it is given
         self.x = [[0], [0], [0], [0], [0], [0], [1], [1], [1], [1], [1]]
 
-        def powerinjections(self):
-            # filling Pk
-            k = 0
-            while k < 6:
-                # summation for Pk
+    def powerinjections(self):
+        # filling Pk
+        k = 0
+        while k < 6:
+            # summation for Pk
             # then iterate K
             # new while loop to fill Qk
             # summation for Qk
