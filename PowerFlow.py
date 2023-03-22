@@ -27,11 +27,11 @@ class PowerFlow:
                 n = n + 1
             k = k + 1       # at the end of this set of while loops, k should be 6
             # new while loop to fill Qk
-        while k < 11
+        while k < 11:
             # summation for Qk
             n = 0
             while n < 6:
-                self.f_x[k] = self.x[]
+                #self.f_x[k] = self.x[]
 
         # function ends with Pk and Qk values populated
 
