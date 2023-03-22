@@ -1,5 +1,6 @@
 from Ybus import Ybus
 from Network import Network
+from PowerFlow import PowerFlow
 
 # building the network
 network_obj = Network('network1')
@@ -38,4 +39,9 @@ network_obj.add_transformer('T2', network_obj.transformer_data['T2'], 'bus6', 'b
 # creating Ybus object
 ybus_obj = Ybus('ybus1', network_obj)
 ybus_obj.fill_ybus_matrix()
-ybus_obj.print_ybus_matrix()
+# ybus_obj.print_ybus_matrix()
+
+# temp work - testing power mismatch
+PF1_obj = PowerFlow(ybus_obj)
+PF1_obj.power_mismatch()
+PF1_obj.temp_out()

@@ -30,14 +30,14 @@ class PowerFlow:
         while k < 5:
             # summation for Pk
             n = 0
-            while n < 6:
+            while n < 5:
                 self.f_x[k][0] = self.x[6+k][0] * abs(self.ybus.Y_matrix[k][n]) * self.x[6+n][0] * cmath.cos(self.x[k][0] - self.x[n][0] - cmath.phase(self.ybus.Y_matrix[k][n]))
                 n = n + 1
             k = k + 1       # at the end of this set of while loops, k should be 5
 
         # while loop to fill P7 specifically, as V7 isn't included in the x matrix
         n = 0
-        while n < 6:
+        while n < 5:
             self.f_x[k][0] = self.V7 * abs(self.ybus.Y_matrix[k][n]) * self.x[6 + n][0] * cmath.cos(self.x[k][0] - self.x[n][0] - cmath.phase(self.ybus.Y_matrix[k][n]))
             n = n + 1
         k = k + 1
@@ -46,7 +46,7 @@ class PowerFlow:
         while k < 11:
             # summation for Qk, matrix positions 6 -> 10
             n = 0
-            while n < 6:
+            while n < 5:
                 self.f_x[k][0] = self.x[k][0] * abs(self.ybus.Y_matrix[k-6][n]) * self.x[6 + n][0] * cmath.sin(self.x[k-6][0] - self.x[n][0] - cmath.phase(self.ybus.Y_matrix[k-6][n]))
                 n = n + 1
             k = k + 1
@@ -55,7 +55,11 @@ class PowerFlow:
         # Now solving for power mismatch
         k = 0
         while k < 11:
-            self.dy_x[k][0] = self.y[k][0] - self.f_x[k][0]
+            self.dy_x[k][0] = abs(self.y[k][0] - self.f_x[k][0])
             k = k + 1
 
-
+    def temp_out(self):
+        for inner_list in self.dy_x:
+            for element in  inner_list:
+                print(element, end=" ")
+            print()
