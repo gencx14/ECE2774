@@ -18,3 +18,12 @@ class Bus:
 
     def set_bus_type(self, bustype: str):   # sets the type of bus for power flow
         self.bustype = bustype
+
+    def set_delta(self, delta):     # sets the delta of the bus
+        self.delta = delta
+
+    def set_P(self, p):     # sets the P of the bus
+        self.P = p
+
+    def set_Q(self, q):     # sets the Q of the bus
+        self.Q = q
