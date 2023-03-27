@@ -43,5 +43,5 @@ ybus_obj.fill_ybus_matrix()
 
 # temp work - testing power mismatch
 PF1_obj = PowerFlow(ybus_obj)
-PF1_obj.power_mismatch()
+#PF1_obj.power_mismatch()
 PF1_obj.temp_out()
