@@ -1,4 +1,5 @@
 import cmath as cmath
+import numpy as np
 from Ybus import Ybus
 from Bus import Bus
 
@@ -13,7 +14,21 @@ class PowerFlow:
         self.ybus = ybus
 
         # start with a matrix of every P and Q, then use an if statement to cut down to only Load P and Q and PV bus P
-        # the rows that had the slack bus P and Q and PV Q need to also be cut out of the Jacobian
+        # the rows that contain PV Qs need to also be cut out of the Jacobian
+
+        # vector of every P, Q
+        self.y1 = np.zeros(1, self.N)
+
+        self.tempP
+        self.tempQ
+        value = 0
+        for key in self.ybus.network.buses:
+            self.tempP = self.ybus.network.buses[key].P
+            self.tempQ = self.ybus.network.buses[key].Q
+            if self.ybus.network.buses[key].bustype != 'slack' and self.ybus.network.buses[key].bustype != 'PV':
+                self.y1[0][value] = self.tempP
+                self.y1[0][value + self.N] = self.tempQ
+
         # matrix of bus Ps and bus Qs except for generator bus Q
         self.y = [[0], [-110], [-100], [-100], [-0], [200], [0], [-50], [-70], [-65], [0]]
 
@@ -33,21 +48,20 @@ class PowerFlow:
     def power_mismatch(self):
         # filling Pk and Qk
         k = 0
-        while k <= self.N:        # k runs from 0 -> 6
-            # summation for Pk: P2 - P6
-            n = 1
-            while n < self.N:
+        while k < self.N - 1:        # k runs from 0 -> 4, so it fills f_x 0 up to but not including 5
+            n = 0
+            while n < self.N - 1:
                 # calculates Pk
-                self.f_x[k][0] = self.f_x[k][0] + (self.x[k+self.N][0] * abs(self.ybus.Y_matrix[k][n]) * self.x[n+self.N][0] * cmath.cos(self.x[k][0] - self.x[n][0] - cmath.phase(self.ybus.Y_matrix[k][n])))
+                self.f_x[k][0] = self.f_x[k][0] + (self.x[k+self.N][0] * abs(self.ybus.Y_matrix[k+1][n+1]) * self.x[n+self.N][0] * cmath.cos(self.x[k][0] - self.x[n][0] - cmath.phase(self.ybus.Y_matrix[k+1][n+1])))
 
                 # calculates Qk
-                self.f_x[k + self.N][0] = self.f_x[k][0] + (self.x[k][0] * abs(self.ybus.Y_matrix[k][n]) * self.x[n][0] * cmath.sin(self.x[k][0] - self.x[n][0] - cmath.phase(self.ybus.Y_matrix[k][n])))
+                self.f_x[k + self.N][0] = self.f_x[k + self.N][0] + (self.x[k + self.N][0] * abs(self.ybus.Y_matrix[k+1][n+1]) * self.x[n][0] * cmath.sin(self.x[k][0] - self.x[n][0] - cmath.phase(self.ybus.Y_matrix[k+1][n+1])))
 
                 n = n + 1
-            k = k + 1       # at the end of this set of while loops, k should be 7
+            k = k + 1       # at the end of this set of while loops, k should become 5 and the loop terminates
 
         # while loop to fill P7 specifically, as V7 isn't included in the x matrix
-        n = 1
+        n = 0
         while n < self.N:
             self.f_x[k][0] = self.f_x[k][0] + (self.V7 * abs(self.ybus.Y_matrix[k][n]) * self.x[n][0] * cmath.cos(self.x[k][0] - self.x[n][0] - cmath.phase(self.ybus.Y_matrix[k][n])))
             n = n + 1
