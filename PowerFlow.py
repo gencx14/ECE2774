@@ -8,8 +8,12 @@ class PowerFlow:
     def __init__(self, ybus: Ybus):
         # number of buses in system not including slack bus
         self.N = Bus.count - 1
+
         # bringing in previously calculated admittance matrix
         self.ybus = ybus
+
+        # start with a matrix of every P and Q, then use an if statement to cut down to only Load P and Q and PV bus P
+        # the rows that had the slack bus P and Q and PV Q need to also be cut out of the Jacobian
         # matrix of bus Ps and bus Qs except for generator bus Q
         self.y = [[0], [-110], [-100], [-100], [-0], [200], [0], [-50], [-70], [-65], [0]]
 
@@ -37,7 +41,7 @@ class PowerFlow:
                 self.f_x[k][0] = self.f_x[k][0] + (self.x[k+self.N][0] * abs(self.ybus.Y_matrix[k][n]) * self.x[n+self.N][0] * cmath.cos(self.x[k][0] - self.x[n][0] - cmath.phase(self.ybus.Y_matrix[k][n])))
 
                 # calculates Qk
-                self.f_x[k][0] = self.f_x[k][0] + (self.x[k][0] * abs(self.ybus.Y_matrix[k][n]) * self.x[n][0] * cmath.sin(self.x[k][0] - self.x[n][0] - cmath.phase(self.ybus.Y_matrix[k][n])))
+                self.f_x[k + self.N][0] = self.f_x[k][0] + (self.x[k][0] * abs(self.ybus.Y_matrix[k][n]) * self.x[n][0] * cmath.sin(self.x[k][0] - self.x[n][0] - cmath.phase(self.ybus.Y_matrix[k][n])))
 
                 n = n + 1
             k = k + 1       # at the end of this set of while loops, k should be 7

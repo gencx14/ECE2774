@@ -41,6 +41,10 @@ ybus_obj = Ybus('ybus1', network_obj)
 ybus_obj.fill_ybus_matrix()
 # ybus_obj.print_ybus_matrix()
 
+# setting bus types, and relevant parameters
+network_obj.buses['bus1'].set_bus_type('slack')
+network_obj.buses['bus2'].set_
+
 # temp work - testing power mismatch
 PF1_obj = PowerFlow(ybus_obj)
 #PF1_obj.power_mismatch()
