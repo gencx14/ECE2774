@@ -43,9 +43,15 @@ ybus_obj.fill_ybus_matrix()
 
 # setting bus types, and relevant parameters
 network_obj.buses['bus1'].set_bus_type('slack')
-network_obj.buses['bus2'].set_
+network_obj.buses['bus2'].set_bus_type('load')
+network_obj.buses['bus3'].set_bus_type('load')
+network_obj.buses['bus4'].set_bus_type('load')
+network_obj.buses['bus5'].set_bus_type('load')
+network_obj.buses['bus6'].set_bus_type('load')
+network_obj.buses['bus7'].set_bus_type('PV')
+
 
 # temp work - testing power mismatch
 PF1_obj = PowerFlow(ybus_obj)
-#PF1_obj.power_mismatch()
+PF1_obj.power_mismatch()
 PF1_obj.temp_out()

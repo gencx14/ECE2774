@@ -16,18 +16,16 @@ class PowerFlow:
         # start with a matrix of every P and Q, then use an if statement to cut down to only Load P and Q and PV bus P
         # the rows that contain PV Qs need to also be cut out of the Jacobian
 
-        # vector of every P, Q
+        '''# vector of every P, Q
         self.y1 = np.zeros(1, self.N)
 
-        self.tempP
-        self.tempQ
         value = 0
         for key in self.ybus.network.buses:
             self.tempP = self.ybus.network.buses[key].P
             self.tempQ = self.ybus.network.buses[key].Q
             if self.ybus.network.buses[key].bustype != 'slack' and self.ybus.network.buses[key].bustype != 'PV':
                 self.y1[0][value] = self.tempP
-                self.y1[0][value + self.N] = self.tempQ
+                self.y1[0][value + self.N] = self.tempQ'''
 
         # matrix of bus Ps and bus Qs except for generator bus Q
         self.y = [[0], [-110], [-100], [-100], [-0], [200], [0], [-50], [-70], [-65], [0]]
@@ -41,12 +39,29 @@ class PowerFlow:
         # voltage on the generator bus, added as a member to be easily updated and used in power injection equations
         self.V7 = 1
 
+        # voltage on slack bus
+        self.V1 = 1
+
+        # delta on slack bus
+        self.d1 = 0
+
         # power mismatch matrix
         self.dy_x = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
 
     # Uses power injection equations to fill f(x), then calculates power mismatch
     def power_mismatch(self):
         # filling Pk and Qk
+        # first round of summations for Pk and Qk as V1 and d1 are not in the x vector
+        k = 0
+        while k < self.N - 1:
+            # calculates Pk when n = 1
+            self.f_x[k][0] = (self.x[k + self.N][0] * abs(self.ybus.Y_matrix[k + 1][0]) * self.V1 * cmath.cos(self.x[k][0] - self.d1 - cmath.phase(self.ybus.Y_matrix[k + 1][0])))
+
+            # calculates Qk when n = 1
+            self.f_x[k + self.N][0] = (self.x[k + self.N][0] * abs(self.ybus.Y_matrix[k + 1][0]) * self.V1 * cmath.sin(self.x[k][0] - self.d1 - cmath.phase(self.ybus.Y_matrix[k + 1][0])))
+
+            k = k + 1  # at the end of this set of while loops, k should become 5 and the loop terminates
+
         k = 0
         while k < self.N - 1:        # k runs from 0 -> 4, so it fills f_x 0 up to but not including 5
             n = 0
@@ -59,6 +74,9 @@ class PowerFlow:
 
                 n = n + 1
             k = k + 1       # at the end of this set of while loops, k should become 5 and the loop terminates
+
+        # first sum of P7 since V1 and d1 aren't in the x vector
+        self.f_x[k][0] = self.V7 * abs(self.ybus.Y_matrix[k][0]) * self.V1 * cmath.cos(self.x[k][0] - self.d1 - cmath.phase(self.ybus.Y_matrix[k][0]))
 
         # while loop to fill P7 specifically, as V7 isn't included in the x matrix
         n = 0
@@ -78,4 +96,3 @@ class PowerFlow:
             for element in inner_list:
                 print(element, end=" ")
             print()
-        print(self.N)
