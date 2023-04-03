@@ -48,6 +48,18 @@ class PowerFlow:
         # power mismatch matrix
         self.dy_x = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
 
+        # Jacobian quadrant J1
+        self.J1 = np.zeros(self.N, self.N)
+
+        # Jacobian quadrant J2, one less column due to no V7
+        self.J2 = np.zeros(self.N, self.N - 1)
+
+        # Jacobian quadrant J3, one less row due to no Q7
+        self.J3 = np.zeros(self.N - 1, self.N)
+
+        #Jacobian quadrant J4, one less row and one less column due to no V7 and no Q7
+        self.J4 = np.zeros(self.N - 1, self.N - 1)
+
     # Uses power injection equations to fill f(x), then calculates power mismatch
     def power_mismatch(self):
         # filling Pk and Qk
@@ -55,10 +67,12 @@ class PowerFlow:
         k = 0
         while k < self.N - 1:
             # calculates Pk when n = 1
-            self.f_x[k][0] = (self.x[k + self.N][0] * abs(self.ybus.Y_matrix[k + 1][0]) * self.V1 * cmath.cos(self.x[k][0] - self.d1 - (cmath.phase(self.ybus.Y_matrix[k + 1][0] * 180 / cmath.pi))))
+            self.f_x[k][0] = (self.x[k + self.N][0] * abs(self.ybus.Y_matrix[k + 1][0]) * self.V1 *
+                              cmath.cos(self.x[k][0] - self.d1 - (cmath.phase(self.ybus.Y_matrix[k + 1][0] * 180 / cmath.pi))))
 
             # calculates Qk when n = 1
-            self.f_x[k + self.N][0] = (self.x[k + self.N][0] * abs(self.ybus.Y_matrix[k + 1][0]) * self.V1 * cmath.sin(self.x[k][0] - self.d1 - (cmath.phase(self.ybus.Y_matrix[k + 1][0] * 180 / cmath.pi))))
+            self.f_x[k + self.N][0] = (self.x[k + self.N][0] * abs(self.ybus.Y_matrix[k + 1][0]) * self.V1 *
+                                       cmath.sin(self.x[k][0] - self.d1 - (cmath.phase(self.ybus.Y_matrix[k + 1][0] * 180 / cmath.pi))))
 
             k = k + 1  # at the end of this set of while loops, k should become 5 and the loop terminates
 
@@ -67,21 +81,25 @@ class PowerFlow:
             n = 0
             while n < self.N - 1:
                 # calculates Pk
-                self.f_x[k][0] = self.f_x[k][0] + (self.x[k+self.N][0] * abs(self.ybus.Y_matrix[k+1][n+1]) * self.x[n+self.N][0] * cmath.cos(self.x[k][0] - self.x[n][0] - (cmath.phase(self.ybus.Y_matrix[k+1][n+1]) * 180 / cmath.pi)))
+                self.f_x[k][0] = self.f_x[k][0] + (self.x[k+self.N][0] * abs(self.ybus.Y_matrix[k+1][n+1]) * self.x[n+self.N][0] *
+                                                   cmath.cos(self.x[k][0] - self.x[n][0] - (cmath.phase(self.ybus.Y_matrix[k+1][n+1]) * 180 / cmath.pi)))
 
                 # calculates Qk
-                self.f_x[k + self.N][0] = self.f_x[k + self.N][0] + (self.x[k + self.N][0] * abs(self.ybus.Y_matrix[k+1][n+1]) * self.x[n][0] * cmath.sin(self.x[k][0] - self.x[n][0] - (cmath.phase(self.ybus.Y_matrix[k+1][n+1]) * 180 / cmath.pi)))
+                self.f_x[k + self.N][0] = self.f_x[k + self.N][0] + (self.x[k + self.N][0] * abs(self.ybus.Y_matrix[k+1][n+1]) * self.x[n][0] *
+                                                                     cmath.sin(self.x[k][0] - self.x[n][0] - (cmath.phase(self.ybus.Y_matrix[k+1][n+1]) * 180 / cmath.pi)))
 
                 n = n + 1
             k = k + 1       # at the end of this set of while loops, k should become 5 and the loop terminates
 
         # first sum of P7 since V1 and d1 aren't in the x vector
-        self.f_x[k][0] = self.V7 * abs(self.ybus.Y_matrix[k][0]) * self.V1 * cmath.cos(self.x[k][0] - self.d1 - (cmath.phase(self.ybus.Y_matrix[k][0]) * 180 / cmath.pi))
+        self.f_x[k][0] = self.V7 * abs(self.ybus.Y_matrix[k][0]) * self.V1 * \
+                         cmath.cos(self.x[k][0] - self.d1 - (cmath.phase(self.ybus.Y_matrix[k][0]) * 180 / cmath.pi))
 
         # while loop to fill P7 specifically, as V7 isn't included in the x matrix
         n = 0
         while n < self.N:
-            self.f_x[k][0] = self.f_x[k][0] + (self.V7 * abs(self.ybus.Y_matrix[k][n]) * self.x[n][0] * cmath.cos(self.x[k][0] - self.x[n][0] - (cmath.phase(self.ybus.Y_matrix[k][n])  * 180 / cmath.pi)))
+            self.f_x[k][0] = self.f_x[k][0] + (self.V7 * abs(self.ybus.Y_matrix[k][n]) * self.x[n][0] *
+                                               cmath.cos(self.x[k][0] - self.x[n][0] - (cmath.phase(self.ybus.Y_matrix[k][n]) * 180 / cmath.pi)))
             n = n + 1
 
         # Pk and Qk values populated into f(x) matrix
@@ -90,6 +108,15 @@ class PowerFlow:
         while k < 11:
             self.dy_x[k][0] = (self.y[k][0]).real - (self.f_x[k][0]).real
             k = k + 1
+
+    def fill_j1(self):
+        k = 0
+        while k < self.N - 1:
+            n = 0
+            while n < self.N-1
+    def jacobian(self):
+        pass
+
 
     def temp_out(self):
         for inner_list in self.dy_x:
