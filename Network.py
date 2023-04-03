@@ -26,6 +26,13 @@ class Network:
             self.buses[bus_name] = Bus(bus_name)
             self.buses_order.append(bus_name)
 
+    def set_bus_data(self, key, bustype, voltage, delta, p, q):
+        self.buses[key].set_bus_type(bustype)
+        self.buses[key].set_bus_voltage(voltage)
+        self.buses[key].set_delta(delta)
+        self.buses[key].set_p(p)
+        self.buses[key].set_q(q)
+
     def add_geometry(self, name, x1, y1, x2, y2, x3, y3):      # put positions in array, pass array, cuts down on inputs
         if name not in self.geometries.keys():
             self.geometries[name] = Geometry(name, x1, y1, x2, y2, x3, y3)

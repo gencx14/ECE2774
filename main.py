@@ -41,17 +41,17 @@ ybus_obj = Ybus('ybus1', network_obj)
 ybus_obj.fill_ybus_matrix()
 # ybus_obj.print_ybus_matrix()
 
-# setting bus types, and relevant parameters
-network_obj.buses['bus1'].set_bus_type('slack')
-network_obj.buses['bus2'].set_bus_type('load')
-network_obj.buses['bus3'].set_bus_type('load')
-network_obj.buses['bus4'].set_bus_type('load')
-network_obj.buses['bus5'].set_bus_type('load')
-network_obj.buses['bus6'].set_bus_type('load')
-network_obj.buses['bus7'].set_bus_type('PV')
+# setting bus types, and relevant parameters (key, type, voltage, delta, p, q)
+network_obj.set_bus_data('bus1', 1, 1, 0, 0, 0)
+network_obj.set_bus_data('bus2', 2, 0, 0, 0, 0)
+network_obj.set_bus_data('bus3', 2, 0, 0, -110, -50)
+network_obj.set_bus_data('bus4', 2, 0, 0, -100, -70)
+network_obj.set_bus_data('bus5', 2, 0, 0, -100, -65)
+network_obj.set_bus_data('bus6', 2, 0, 0, 0, 0)
+network_obj.set_bus_data('bus7', 3, 1, 0, 200, 0)
 
 
 # temp work - testing power mismatch
-PF1_obj = PowerFlow(ybus_obj)
+PF1_obj = PowerFlow(ybus_obj, 100)
 PF1_obj.power_mismatch()
 PF1_obj.temp_out()
