@@ -51,7 +51,7 @@ class PowerFlow:
         k = 0
         while k < 2 * self.N:
             n = 0
-            while n < self.N:       # check the loop values
+            while n < self.N:
                 if k < 6:
                     # calculates Pk
                     self.f_x[k][0] = self.f_x[k][0] + (self.x[k+self.N][0] * abs(self.ybus.Y_matrix[k][n]) * self.x[n+self.N][0] * cmath.cos(self.x[k][0] - self.x[n][0] - cmath.phase(self.ybus.Y_matrix[k][n])))
@@ -59,7 +59,7 @@ class PowerFlow:
 
                 else:
                     # calculates Qk
-                    self.f_x[k + self.N][0] = self.f_x[k + self.N][0] + (self.x[k + self.N][0] * abs(self.ybus.Y_matrix[k-self.N][n]) * self.x[n+self.N][0] * cmath.sin(self.x[k][0] - self.x[n][0] - cmath.phase(self.ybus.Y_matrix[k-self.N][n])))
+                    self.f_x[k][0] = self.f_x[k][0] + (self.x[k][0] * abs(self.ybus.Y_matrix[k-self.N][n]) * self.x[n+self.N][0] * cmath.sin(self.x[k][0] - self.x[n][0] - cmath.phase(self.ybus.Y_matrix[k-self.N][n])))
                     n = n + 1
 
             k = k + 1
@@ -70,11 +70,11 @@ class PowerFlow:
         for key in reversed(self.ybus.network.buses):
             if k >= 7:
                 if self.ybus.network.buses[key].bustype == 1 or self.ybus.network.buses[key].bustype == 3:
-                    np.delete(self.f_x[k][0])
+                    del self.f_x[k][0]
                     k = k + 1
             else:
                 if self.ybus.network.buses[key].bustype == 1:
-                    np.delete(self.f_x[k][0])
+                    del self.f_x[k][0]
                     k = k + 1
 
         # Calculating power mismatch
