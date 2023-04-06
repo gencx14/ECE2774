@@ -51,15 +51,15 @@ class PowerFlow:
         k = 0
         while k < 2 * self.N:
             n = 0
-            while n < 2 * self.N:
-                if k <= 6:
+            while n < self.N:       # check the loop values
+                if k < 6:
                     # calculates Pk
                     self.f_x[k][0] = self.f_x[k][0] + (self.x[k+self.N][0] * abs(self.ybus.Y_matrix[k][n]) * self.x[n+self.N][0] * cmath.cos(self.x[k][0] - self.x[n][0] - cmath.phase(self.ybus.Y_matrix[k][n])))
                     n = n + 1
 
                 else:
                     # calculates Qk
-                    self.f_x[k + self.N][0] = self.f_x[k + self.N][0] + (self.x[k + self.N][0] * abs(self.ybus.Y_matrix[k-self.N][n-self.N]) * self.x[n][0] * cmath.sin(self.x[k][0] - self.x[n][0] - cmath.phase(self.ybus.Y_matrix[k-self.N][n-self.N])))
+                    self.f_x[k + self.N][0] = self.f_x[k + self.N][0] + (self.x[k + self.N][0] * abs(self.ybus.Y_matrix[k-self.N][n]) * self.x[n+self.N][0] * cmath.sin(self.x[k][0] - self.x[n][0] - cmath.phase(self.ybus.Y_matrix[k-self.N][n])))
                     n = n + 1
 
             k = k + 1
