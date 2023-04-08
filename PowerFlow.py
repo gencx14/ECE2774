@@ -53,12 +53,14 @@ class PowerFlow:
             while n < self.N:
                 if k < 6:
                     # calculates Pk
-                    self.f_x[k][0] = self.f_x[k][0] + (self.x[k+self.N][0] * abs(self.ybus.Y_matrix[k][n]) * self.x[n+self.N][0] * math.cos(self.x[k][0] - self.x[n][0] - math.phase(self.ybus.Y_matrix[k][n])))
+                    self.f_x[k][0] += (self.x[k+self.N][0] * abs(self.ybus.Y_matrix[k][n]) * self.x[n+self.N][0] *
+                                       math.cos(self.x[k][0] - self.x[n][0] - np.angle(self.ybus.Y_matrix[k][n])))
                     n = n + 1
 
                 else:
                     # calculates Qk
-                    self.f_x[k][0] = self.f_x[k][0] + (self.x[k][0] * abs(self.ybus.Y_matrix[k-self.N][n]) * self.x[n+self.N][0] * math.sin(self.x[k][0] - self.x[n][0] - math.phase(self.ybus.Y_matrix[k-self.N][n])))
+                    self.f_x[k][0] += (self.x[k][0] * abs(self.ybus.Y_matrix[k-self.N][n]) * self.x[n+self.N][0] *
+                                      math.sin(self.x[k][0] - self.x[n][0] - np.angle(self.ybus.Y_matrix[k-self.N][n])))
                     n = n + 1
 
             k = k + 1
@@ -93,7 +95,8 @@ class PowerFlow:
                 if k == n:
                     self.J1[k][n] = 0
                 else:
-                    self.J1[k][n] = self.x[k+self.N][0] * abs(self.ybus.Y_matrix[k][n]) * self.x[n+self.N][0] * math.sin(self.x[k][0] - self.x[n][0] - math.phase(self.ybus.Y_matrix[k][n]))
+                    self.J1[k][n] = self.x[k+self.N][0] * abs(self.ybus.Y_matrix[k][n]) * self.x[n+self.N][0] * \
+                                    math.sin(self.x[k][0] - self.x[n][0] - np.angle(self.ybus.Y_matrix[k][n]))
 
     def fill_j2(self):
         k = 0
@@ -103,7 +106,8 @@ class PowerFlow:
                 if k == n:
                     self.J2[k][n] = 0
                 else:
-                    self.J2[k][n] = self.x[k + self.N][0] * abs(self.ybus.Y_matrix[k][n]) * math.cos(self.x[k][0] - self.x[n][0] - math.phase(self.ybus.Y_matrix[k][n]))
+                    self.J2[k][n] = self.x[k + self.N][0] * abs(self.ybus.Y_matrix[k][n]) * \
+                                    math.cos(self.x[k][0] - self.x[n][0] - np.angle(self.ybus.Y_matrix[k][n]))
 
     def fill_j3(self):
         k = 0
@@ -113,7 +117,8 @@ class PowerFlow:
                 if k == n:
                     self.J3[k][n] = 0
                 else:
-                    self.J3[k][n] = -1 * self.x[k + self.N][0] * abs(self.ybus.Y_matrix[k][n]) * self.x[n + self.N][0] * math.cos(self.x[k][0] - self.x[n][0] - math.phase(self.ybus.Y_matrix[k][n]))
+                    self.J3[k][n] = -1 * self.x[k + self.N][0] * abs(self.ybus.Y_matrix[k][n]) * self.x[n + self.N][0] * \
+                                    math.cos(self.x[k][0] - self.x[n][0] - np.angle(self.ybus.Y_matrix[k][n]))
 
     def fill_j4(self):
         k = 0
@@ -123,7 +128,8 @@ class PowerFlow:
                 if k == n:
                     self.J4[k][n] = 0
                 else:
-                    self.J4[k][n] = self.x[k + self.N][0] * abs(self.ybus.Y_matrix[k][n]) * math.sin(self.x[k][0] - self.x[n][0] - math.phase(self.ybus.Y_matrix[k][n]))
+                    self.J4[k][n] = self.x[k + self.N][0] * abs(self.ybus.Y_matrix[k][n]) * \
+                                    math.sin(self.x[k][0] - self.x[n][0] - np.angle(self.ybus.Y_matrix[k][n]))
 
     def jacobian(self):
         # calling functions to fill quadrants
@@ -135,8 +141,35 @@ class PowerFlow:
         # combine quadrants using block function
         self.J = np.block([self.J1, self.J2], [self.J3, self.J4])
 
-        # cut down necessary rows and columns, see how it was done in the power_mismatch section
-
+        # cut down necessary rows. Rows involving P1, Q1, and Q7 should be removed
+        k = self.N * 2
+        for key in reversed(self.ybus.network.buses):    # this loop will end when k = 7
+            if self.ybus.network.buses[key].bustype == 1 or self.ybus.network.buses[key].bustype == 3:
+                self.J = np.delete(self.J, k, axis=0)
+                k = k - 1
+            else:
+                k = k - 1
+        for key in reversed(self.ybus.network.buses):
+            if self.ybus.network.buses[key].bustype == 1:
+                self.J = np.delete(self.J, k, axis=0)
+                k = k - 1
+            else:
+                k = k - 1
+        # cut down necessary columns
+        n = self.N * 2
+        for key in reversed(self.ybus.network.buses):
+            if self.ybus.network.buses[key].bustype == 1 or self.ybus.network.buses[key].bustype == 3:
+                self.J = np.delete(self.J, n, axis=1)
+                n = n - 1
+            else:
+                n = n - 1
+        for key in reversed(self.ybus.network.buses):
+            if self.ybus.network.buses[key].bustype == 1:
+                self.J = np.delete(self.J, n, axis=1)
+                n = n - 1
+            else:
+                n = n - 1
+        # J should be filled with proper rows and columns cut out
 
     def temp_out(self):
         for inner_list in self.dy_x:
