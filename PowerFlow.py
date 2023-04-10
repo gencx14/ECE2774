@@ -1,4 +1,3 @@
-import math as math
 import numpy as np
 from Ybus import Ybus
 from Bus import Bus
@@ -53,13 +52,13 @@ class PowerFlow:
             while n < self.N:
                 if k < self.N:
                     # calculates Pk
-                    self.f_x[k][0] += (self.x[k+self.N][0] * abs(self.y_matrix[k][n]) * self.x[n+self.N][0] * math.cos(np.deg2rad(self.x[k][0] - self.x[n][0] - np.angle(self.y_matrix[k][n]))))
-                    n = n + 1
+                    self.f_x[k][0] += (self.x[k+self.N][0] * abs(self.y_matrix[k][n]) * self.x[n+self.N][0] * np.cos(self.x[k][0] - self.x[n][0] - np.angle(self.y_matrix[k][n])))
 
                 else:
                     # calculates Qk
-                    self.f_x[k][0] += (self.x[k][0] * abs(self.y_matrix[k-self.N][n]) * self.x[n+self.N][0] * math.sin(np.deg2rad(self.x[k][0] - self.x[n][0] - np.angle(self.y_matrix[k-self.N][n]))))
-                    n = n + 1
+                    self.f_x[k][0] += (self.x[k][0] * abs(self.y_matrix[k-self.N][n]) * self.x[n+self.N][0] * np.sin(self.x[k][0] - self.x[n][0] - np.angle(self.y_matrix[k-self.N][n])))
+
+                n = n + 1
 
         # Trimming f_x to match the length of y
         k = 2 * self.N - 1
@@ -85,7 +84,7 @@ class PowerFlow:
         num = 0
         while w < self.N:
             if k != w:
-                num += (abs(self.y_matrix[k][w]) * self.x[w + self.N][0] * np.sin(np.deg2rad(self.x[k][0] - self.x[w][0] - np.angle(self.y_matrix[k][w]))))
+                num += (abs(self.y_matrix[k][w]) * self.x[w + self.N][0] * np.sin(self.x[k][0] - self.x[w][0] - np.angle(self.y_matrix[k][w])))
                 w = w + 1
             else:
                 w = w + 1
@@ -97,14 +96,14 @@ class PowerFlow:
         while w < self.N:
             num += (abs(self.y_matrix[k][w]) * self.x[w + self.N][0] * np.cos(np.deg2rad(self.x[k][0] - self.x[w][0] - np.angle(self.y_matrix[k][w]))))
             w = w + 1
-        return num + (self.x[k + self.N][0] * abs(self.y_matrix[k][k]) * np.cos(np.deg2rad(np.angle(self.y_matrix[k][k]))))
+        return num + (self.x[k + self.N][0] * abs(self.y_matrix[k][k]) * np.cos(np.angle(self.y_matrix[k][k])))
 
     def j3_diagonal(self, k):
         w = 0
         num = 0
         while w < self.N:
             if k != w:
-                num += (abs(self.y_matrix[k][w]) * self.x[w + self.N][0] * np.cos(np.deg2rad(self.x[k][0] - self.x[w][0] - np.angle(self.y_matrix[k][w]))))
+                num += (abs(self.y_matrix[k][w]) * self.x[w + self.N][0] * np.cos(self.x[k][0] - self.x[w][0] - np.angle(self.y_matrix[k][w])))
                 w = w + 1
             else:
                 w = w + 1
@@ -114,59 +113,59 @@ class PowerFlow:
         w = 0
         num = 0
         while w < self.N:
-                num += (abs(self.y_matrix[k][w]) * self.x[w + self.N][0] * np.sin(np.deg2rad(self.x[k][0] - self.x[w][0] - np.angle(self.y_matrix[k][w]))))
+                num += (abs(self.y_matrix[k][w]) * self.x[w + self.N][0] * np.sin(self.x[k][0] - self.x[w][0] - np.angle(self.y_matrix[k][w])))
                 w = w + 1
-        return num + (-1 * self.x[k + self.N] * abs(self.y_matrix[k][k]) * np.sin(np.deg2rad(np.angle(self.y_matrix[k][k]))))
+        return num + (-1 * self.x[k + self.N] * abs(self.y_matrix[k][k]) * np.sin(np.angle(self.y_matrix[k][k])))
 
     def fill_j1(self):
         k = 0
-        while k < self.N - 1:
+        while k < self.N:
             n = 0
-            while n < self.N - 1:
-                if k == n:
-                    self.J[k][n] = self.j1_diagonal(k)
+            while n < self.N:
+                if k != n:
+                    self.J1[k][n] = self.x[k + self.N][0] * abs(self.y_matrix[k][n]) * self.x[n + self.N][0] * np.sin(self.x[k][0] - self.x[n][0] - np.angle(self.y_matrix[k][n]))
                     n = n + 1
                 else:
-                    self.J1[k][n] = self.x[k+self.N][0] * abs(self.y_matrix[k][n]) * self.x[n+self.N][0] * math.sin(self.x[k][0] - self.x[n][0] - np.angle(self.y_matrix[k][n]))
+                    self.J[k][n] = self.j1_diagonal(k)
                     n = n + 1
             k = k + 1
 
     def fill_j2(self):
         k = 0
-        while k < self.N - 1:
+        while k < self.N:
             n = 0
-            while n < self.N - 1:
-                if k == n:
-                    self.J2[k][n] = self.j2_diagonal(k)
+            while n < self.N:
+                if k != n:
+                    self.J2[k][n] = self.x[k + self.N][0] * abs(self.y_matrix[k][n]) * np.cos(self.x[k][0] - self.x[n][0] - np.angle(self.y_matrix[k][n]))
                     n = n + 1
                 else:
-                    self.J2[k][n] = self.x[k + self.N][0] * abs(self.y_matrix[k][n]) * math.cos(self.x[k][0] - self.x[n][0] - np.angle(self.y_matrix[k][n]))
+                    self.J2[k][n] = self.j2_diagonal(k)
                     n = n + 1
             k = k + 1
 
     def fill_j3(self):
         k = 0
-        while k < self.N - 1:
+        while k < self.N:
             n = 0
-            while n < self.N - 1:
-                if k == n:
-                    self.J3[k][n] = self.j3_diagonal(k)
+            while n < self.N:
+                if k != n:
+                    self.J3[k][n] = -1 * self.x[k + self.N][0] * abs(self.y_matrix[k][n]) * self.x[n + self.N][0] * np.cos(self.x[k][0] - self.x[n][0] - np.angle(self.y_matrix[k][n]))
                     n = n + 1
                 else:
-                    self.J3[k][n] = -1 * self.x[k + self.N][0] * abs(self.y_matrix[k][n]) * self.x[n + self.N][0] * math.cos(self.x[k][0] - self.x[n][0] - np.angle(self.y_matrix[k][n]))
+                    self.J3[k][n] = self.j3_diagonal(k)
                     n = n + 1
             k = k + 1
 
     def fill_j4(self):
         k = 0
-        while k < self.N - 1:
+        while k < self.N:
             n = 0
-            while n < self.N - 1:
-                if k == n:
-                    self.J4[k][n] = self.j4_diagonal(k)
+            while n < self.N:
+                if k != n:
+                    self.J4[k][n] = self.x[k + self.N][0] * abs(self.y_matrix[k][n]) * np.sin(self.x[k][0] - self.x[n][0] - np.angle(self.y_matrix[k][n]))
                     n = n + 1
                 else:
-                    self.J4[k][n] = self.x[k + self.N][0] * abs(self.y_matrix[k][n]) * math.sin(self.x[k][0] - self.x[n][0] - np.angle(self.y_matrix[k][n]))
+                    self.J4[k][n] = self.j4_diagonal(k)
                     n = n + 1
             k = k + 1
 
@@ -185,7 +184,10 @@ class PowerFlow:
         w = 0
         while w < 2:
             for key in reversed(self.network.buses):
-                if self.network.buses[key].bustype == 1 or self.network.buses[key].bustype == 3:
+                if self.network.buses[key].bustype == 1:
+                    self.J = np.delete(self.J, k, axis=0)
+                    k = k - 1
+                elif self.network.buses[key].bustype == 3 and k > 6:
                     self.J = np.delete(self.J, k, axis=0)
                     k = k - 1
                 else:
@@ -197,7 +199,10 @@ class PowerFlow:
         w = 0
         while w < 2:
             for key in reversed(self.network.buses):
-                if self.network.buses[key].bustype == 1 or self.network.buses[key].bustype == 3:
+                if self.network.buses[key].bustype == 1:
+                    self.J = np.delete(self.J, n, axis=1)
+                    n = n - 1
+                elif self.network.buses[key].bustype == 3 and n > 6:
                     self.J = np.delete(self.J, n, axis=1)
                     n = n - 1
                 else:
@@ -206,8 +211,8 @@ class PowerFlow:
         # J should be filled with proper rows and columns cut out
         print(self.J)
 
-    def temp_out(self):
+    '''def temp_out(self):
         for inner_list in self.dy_x:
             for element in inner_list:
                 print(element, end=" ")
-            print()
+            print()'''
