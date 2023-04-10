@@ -52,7 +52,7 @@ network_obj.set_bus_data('bus7', 3, 1, 0, 200, 0)
 
 
 # temp work - testing power mismatch
-PF1_obj = PowerFlow(ybus_obj)
+PF1_obj = PowerFlow(ybus_obj, network_obj)
 PF1_obj.flat_start()
 PF1_obj.power_mismatch()
 PF1_obj.jacobian()
