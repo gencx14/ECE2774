@@ -107,7 +107,7 @@ class PowerFlow:
                 w = w + 1
             else:
                 w = w + 1
-        return num * self.x[k + self.N]
+        return -1 * num * self.x[k + self.N]
 
     def j4_diagonal(self, k):
         w = 0
@@ -126,7 +126,7 @@ class PowerFlow:
                     self.J1[k][n] = self.x[k + self.N][0] * abs(self.y_matrix[k][n]) * self.x[n + self.N][0] * np.sin(self.x[k][0] - self.x[n][0] - np.angle(self.y_matrix[k][n]))
                     n = n + 1
                 else:
-                    self.J[k][n] = self.j1_diagonal(k)
+                    self.J1[k][n] = self.j1_diagonal(k)
                     n = n + 1
             k = k + 1
 
@@ -149,7 +149,7 @@ class PowerFlow:
             n = 0
             while n < self.N:
                 if k != n:
-                    self.J3[k][n] = -1 * self.x[k + self.N][0] * abs(self.y_matrix[k][n]) * self.x[n + self.N][0] * np.cos(self.x[k][0] - self.x[n][0] - np.angle(self.y_matrix[k][n]))
+                    self.J3[k][n] = self.x[k + self.N][0] * abs(self.y_matrix[k][n]) * self.x[n + self.N][0] * np.cos(self.x[k][0] - self.x[n][0] - np.angle(self.y_matrix[k][n]))
                     n = n + 1
                 else:
                     self.J3[k][n] = self.j3_diagonal(k)
