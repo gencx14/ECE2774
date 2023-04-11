@@ -220,4 +220,3 @@ class PowerFlow:
     def calculate_mismatch(self):
         # calculating dx
         self.dx = np.dot(np.linalg.inv(self.J), self.dy_x)
-        self.x_new = self.x + self.dx
