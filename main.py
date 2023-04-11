@@ -51,9 +51,9 @@ network_obj.set_bus_data('bus6', 2, 0, 0, 0, 0)
 network_obj.set_bus_data('bus7', 3, 1, 0, 200, 0)
 
 
-# temp work - testing power mismatch
+# First iteration of Newton-Raphson Power Flow
 PF1_obj = PowerFlow(ybus_obj, network_obj)
 PF1_obj.flat_start()
 PF1_obj.power_mismatch()
 PF1_obj.jacobian()
-# PF1_obj.temp_out()
+PF1_obj.calculate_mismatch()

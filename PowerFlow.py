@@ -24,6 +24,12 @@ class PowerFlow:
         # initial column vector of bus deltas and voltages, empty now but filled in flat start function
         self.x = np.zeros(((2 * self.N), 1))
 
+        # empty column vector to be filled by the output of J^-1 dot dy_x
+        self.dx = np.zeros((len(self.x), 1))
+
+        # empty column vector that will be filled with the new x values
+        self.x_new = np.zeros((len(self.x), 1))
+
         # power mismatch matrix
         self.dy_x = np.zeros((((2*self.N) - 3), 1))
 
@@ -170,6 +176,7 @@ class PowerFlow:
             k = k + 1
 
     def jacobian(self):
+
         # calling functions to fill quadrants
         self.fill_j1()
         self.fill_j2()
@@ -209,10 +216,8 @@ class PowerFlow:
                     n = n - 1
             w = w + 1
         # J should be filled with proper rows and columns cut out
-        print(self.J)
 
-    '''def temp_out(self):
-        for inner_list in self.dy_x:
-            for element in inner_list:
-                print(element, end=" ")
-            print()'''
+    def calculate_mismatch(self):
+        # calculating dx
+        self.dx = np.dot(np.linalg.inv(self.J), self.dy_x)
+        self.x_new = self.x + self.dx
