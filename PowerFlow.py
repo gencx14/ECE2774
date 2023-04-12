@@ -62,7 +62,7 @@ class PowerFlow:
 
                 else:
                     # calculates Qk
-                    self.f_x[k][0] += (self.x[k][0] * abs(self.y_matrix[k-self.N][n]) * self.x[n+self.N][0] * np.sin(self.x[k][0] - self.x[n][0] - np.angle(self.y_matrix[k-self.N][n])))
+                    self.f_x[k][0] += (self.x[k][0] * abs(self.y_matrix[k-self.N][n]) * self.x[n+self.N][0] * np.sin(self.x[k-self.N][0] - self.x[n][0] - np.angle(self.y_matrix[k-self.N][n])))
 
                 n = n + 1
 
@@ -220,3 +220,20 @@ class PowerFlow:
     def calculate_mismatch(self):
         # calculating dx
         self.dx = np.dot(np.linalg.inv(self.J), self.dy_x)
+
+        k = 2 * self.N - 1  # iterator for x vector and new x vector
+        i = 2 * self.N - 4  # iterator for change in x vector
+        w = 0
+        while w < 2:
+            for key in reversed(self.network.buses):
+                if i > 5 and (self.network.buses[key].bustype == 1 or self.network.buses[key].bustype == 3):  # no change if slack or pv
+                    self.x_new[k] = self.x[k]
+                    k = k - 1
+                elif self.network.buses[key] == 1:
+                    self.x_new[k] = self.x[k]
+                    k = k - 1
+                else:
+                    self.x_new[k] = self.x[k] + self.dx[i]
+                    k = k - 1
+                    i = i - 1
+            w = w + 1
