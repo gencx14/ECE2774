@@ -1,4 +1,4 @@
-#HELLO THIS SHOULD BE HERE
+import pandas as pd
 class Load:
     loadCount = 0
     def __init__(self, name, busObject, powerRating, voltageRating):
@@ -9,26 +9,41 @@ class Load:
         self.loadResistance = (voltageRating ** 2) / powerRating
         Load.loadCount += 1
 
+        #may eventually want the following line:
+        #self.buses = [self.bus1]
+
 
     # set functions
-    def setName(self, name):
+    def set_name(self, name):
         self.name = name
-    def setbus1(self, busObject):
+    def set_bus1(self, busObject):
         self.bus1 = busObject
-    def setPower(self, power):
+    def set_power(self, power):
         self.p_rated = power
-    def setvoltage(self, voltageRating):
+    def set_voltage(self, voltageRating):
         self.v_rated = voltageRating
     # get functions
-    def getName(self):
+    def get_name(self):
         return self.name
-    def getbus1(self):
+    def get_bus1(self):
         return self.bus1
 
-    def getRatedPower(self):
+    def get_ratedpower(self):
         return self.p_rated
-    def getRatedVoltage(self):
+    def get_ratedvoltage(self):
         return self.v_rated
-    def getloadResistance(self):
+    def get_loadresistance(self):
         return self.loadResistance
+    #calculate the admittance
+    def calc_admittance(self):
+        #caluclate admittance locally
+        g = 1/self.loadResistance
+        #create a pandas dataframe
+        g_df = pd.DataFrame()
+        #stores the admittance value in the row and column both associated with bus1
+        g_df.loc[self.bus1, self.bus1] = g
+        #stores the admittance to the load object
+        self.g = g_df
+
+
 
