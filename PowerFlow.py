@@ -10,13 +10,16 @@ class PowerFlow:
         # number of buses in system not including slack bus
         self.N = Bus.count
 
+        # power base of system
+        self.base = 100
+
         self.network = network
 
         # bringing in previously calculated admittance matrix
         self.y_matrix = ybus.Y_matrix
 
         # column vector of bus Ps and bus Qs except for generator bus Q and no slack values
-        self.y = [[0], [-1.1], [-1.0], [-1.0], [0], [2.0], [0], [-0.5], [-0.7], [-0.65], [0]]
+        self.y = np.zeros(((2 * self.N) - 3, 1))
 
         # empty matrix of calculated Ps and Qs, will be filled by power_mismatch method
         self.f_x = np.zeros(((2 * self.N), 1))
@@ -41,6 +44,25 @@ class PowerFlow:
 
         # The Jacobian
         self.J = np.zeros((self.N * 2, self.N * 2))
+
+        # The new x vector
+        self.x_new = np.zeros((len(self.x), 1))
+
+    def fill_y(self):
+        k = 0
+        for w in range(2):
+            for key in self.network.buses:
+                if self.network.buses[key].bustype == 1:
+                    continue
+                elif k < 7:
+                    self.y[k] = self.network.buses[key].P / self.base
+                    k = k + 1
+                elif k >= 7 and self.network.buses[key].bustype == 3:
+                    continue
+                else:
+                    self.y[k] = self.network.buses[key].Q / self.base
+                    k = k + 1
+
 
     def flat_start(self):
         # fills x vector with 0.0 for deltas and 1.0 for voltages
@@ -188,8 +210,7 @@ class PowerFlow:
 
         # cut down necessary rows. Rows involving P1, Q1, and Q7 should be removed
         k = (self.N * 2) - 1
-        w = 0
-        while w < 2:
+        for w in range(2):
             for key in reversed(self.network.buses):
                 if self.network.buses[key].bustype == 1:
                     self.J = np.delete(self.J, k, axis=0)
@@ -199,12 +220,10 @@ class PowerFlow:
                     k = k - 1
                 else:
                     k = k - 1
-            w = w + 1
 
         # cut down necessary columns
         n = (self.N * 2) - 1
-        w = 0
-        while w < 2:
+        for w in range(2):
             for key in reversed(self.network.buses):
                 if self.network.buses[key].bustype == 1:
                     self.J = np.delete(self.J, n, axis=1)
@@ -214,12 +233,30 @@ class PowerFlow:
                     n = n - 1
                 else:
                     n = n - 1
-            w = w + 1
         # J should be filled with proper rows and columns cut out
 
     def calculate_mismatch(self):
         # calculating dx
         self.dx = np.dot(np.linalg.inv(self.J), self.dy_x)
 
-
-
+        # combining x with dx to update x vector to new values
+        k = 0  # iterator for x vector
+        i = 0     # iterator for dx vector
+        for w in range(2):
+            for key in self.network.buses:
+                if k < 7:
+                    if self.network.buses[key].bustype == 1:
+                        self.x_new[k] = self.x[k]
+                        k = k + 1
+                    else:
+                        self.x_new[k] = self.x[k] + self.dx[i]
+                        k = k + 1
+                        i = i + 1
+                else:
+                    if self.network.buses[key].bustype == 1 or self.network.buses[key].bustype == 3:
+                        self.x_new[k] = self.x[k]
+                        k = k + 1
+                    else:
+                        self.x_new[k] = self.x[k] + self.dx[i]
+                        k = k + 1
+                        i = i + 1
