@@ -221,5 +221,5 @@ class PowerFlow:
         # calculating dx
         self.dx = np.dot(np.linalg.inv(self.J), self.dy_x)
 
-        # padding dx vector with zeros for values related to a slack or voltage controlled bus
+
 
