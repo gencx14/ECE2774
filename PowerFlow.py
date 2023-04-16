@@ -1,6 +1,7 @@
 import numpy as np
 
 from System import System
+from VoltageMatrix import VoltageMatrix
 import cmath
 
 
@@ -36,6 +37,8 @@ class PowerFlow:
         self.step1_y_array()
         self.step2_x_array_flatstart()
         self.Newton_Raphson()
+        self.updateBusses()
+        self.calcCurrent()
         print()
         #  fill y for power equation from bus information
 
@@ -257,6 +260,13 @@ class PowerFlow:
             dx = np.reshape(dx, (len(dx), 1))
         self.x = self.x + dx
 
+    def updateBusses(self):
+        for n in range(self.N):
+            self.busarr[n].delta1 = float(self.x[n])
+            self.busarr[n].vk = float(self.x[n + self.N])
+            self.busarr[n].pk = float(self.y[n])
+            self.busarr[n].qk = float(self.y[n + self.N])
+
     def Newton_Raphson(self):
         # 1. Set up y array for original P and Q values of all busses... not not in loop
 
@@ -284,111 +294,16 @@ class PowerFlow:
         self.printme += 1
         return self.Newton_Raphson()
 
+    def calcCurrent(self):
+        # 1. form V matrix of each bus
+        # 2. form large V matrix in same fashion as you did with ybus
+        voltmatrix_obj = VoltageMatrix(self.system)
+        voltmatrix = voltmatrix_obj.voltagematrix
+        # 3. I = V*Ybus
+        Imatrix = voltmatrix * self.ybus
+        self.system.Imatrix = Imatrix
+        # Inn = total current injected into node
+        # Ink = total current from bus n to bus k (line current) --> should stick with the positive value
 
 
 
-
-
-
-'''
-    def calc_J1(self):
-        for k in range(self.plength):
-            for n in range(self.plength):
-                if k == n:
-                    self.J1[k][n] = -1 * (self.q_x[k] - (self.x[k + self.plength] * abs(self.ybus[k][n]) * self.x[n + self.plength] * np.sin(np.deg2rad(self.x[k]) - np.deg2rad(self.x[n]) - cmath.phase(self.ybus[k][n]))))
-                else:
-                    self.J1[k][n] = self.x[k + self.plength] * abs(self.ybus[k][n]) * self.x[n + self.plength] * np.sin(
-                        np.deg2rad(self.x[k]) - np.deg2rad(self.x[n]) - cmath.phase(self.ybus[k][n]))
-              
-    def calc_J1(self):
-        self.J1 = np.zeros((self.plength, self.plength))
-        for k in range(self.plength):
-            for n in range(self.plength):
-                if k != n:
-                    self.J1[k][n] = self.x[k+sekf.plength] * abs(self.ybus[k][n]) * self.x[n + self.plength] * np.sin(np.deg2rad(self.x[k]) * np.deg2rad(self.x[n])* cmath.phase(self.ybus[k][n]))
-                else:
-                    temp = 0
-                    for i in range(self.plength):
-                        if i != n:
-                            temp += abs(self.ybus[k][i]) * self.x[i+self.plength] * np.sin(np.deg2rad(self.x[k]) - np.deg2rad(self.x[i]) - cmath.phase(self.ybus[k][i]))
-                    self.J1[k][n] = self.x[k+self.plength] * temp
-                    
-                        
-                    
-
-
-    # find the jacobian
-    def find_jacob(self):
-            for row in element.buses:
-                for col in element.buses:
-                    index_row = self.system.buses[row].index
-                    index_col = self.system.buses[col].index
-
-                    self.J1[index_row, index_col] = self.p_x[index_row, 1] * self.system.ybus[index_row, index_col]
-
-    def calc_J1(self):
-        for k in range(self.plength):
-            for n in range(self.plength):
-                if k == n:
-                    self.J1[k][n] = -1 * (self.q_x[k] - (self.x[k + self.plength] * abs(self.ybus[k][n]) * self.x[n + self.plength] * np.sin(np.deg2rad(self.x[k]) - np.deg2rad(self.x[n]) - cmath.phase(self.ybus[k][n]))))
-                else:
-                    self.J1[k][n] = self.x[k + self.plength] * abs(self.ybus[k][n]) * self.x[n + self.plength] * np.sin(
-                        np.deg2rad(self.x[k]) - np.deg2rad(self.x[n]) - cmath.phase(self.ybus[k][n]))
-
-
-    def calc_J2(self):
-        temp = 0
-        for k in range(self.plength):
-            for n in range(self.plength):
-                t
-                if k == n:
-                    self.J2[k][n] = self.x[k + self.plength] * abs(self.ybus[k][n]) * cmath.cos(cmath.phase(self.ybus[k][n]))
-
-
-
-
-
-
-         J1_df = pd.DataFrame()
-        J1_df.loc[self.ybusarr[k].index, self.ybusarr[k].index] =
-        J1_df.loc[self.ybusarr[k].index, self.ybusarr[n].index] = self.x[k + self.plength] * abs(self.ybus[k][n]) * self.x[n + self.plength] * np.sin(np.rad2deg(self.x[k]) - np.rad2deg(self.x[n]) - np.rad2deg(cmath.phase(self.ybus[k][n])))
-        J1_df.loc[self.ybusarr[n].index, self.ybusarr[k].index] = self.x[n + self.plength] * abs(self.ybus[n][k]) * self.x[k + self.plength] * np.sin(np.rad2deg(self.x[n]) - np.rad2deg(self.x[k]) - np.rad2deg(cmath.phase(self.ybus[n][k])))
-        J1_df.loc[self.ybusarr[n], self.ybusarr[n]] =
-        ##check to see if this saves y as a variable
-        self.J1 = J1_df 
-
-    def calc_J2(self, k, n):
-        J2_df = pd.DataFrame()
-        J2_df.loc[self.ybusarr[k].index, self.ybusarr[k].index] =
-        J2_df.loc[self.ybusarr[k].index, self.ybusarr[n].index] = self.x[k + self.plength] * abs(self.ybus[k][n]) * np.cos(np.rad2deg(self.x[k]) - np.rad2deg(self.x[n]) - np.rad2deg(cmath.phase(self.ybus[k][n])))
-        J2_df.loc[self.ybusarr[n].index, self.ybusarr[k].index] = self.x[n + self.plength] * abs(self.ybus[n][k]) * np.cos(np.rad2deg(self.x[n]) - np.rad2deg(self.x[k]) - np.rad2deg(cmath.phase(self.ybus[n][k])))
-        J2_df.loc[self.ybusarr[n], self.ybusarr[n]] =
-        ##check to see if this saves y as a variable
-        self.J2 = J2_df
-
-    def calc_J3(self, k, n):
-        J3_df = pd.DataFrame()
-        J3_df.loc[self.ybusarr[k].index, self.ybusarr[n].index] =
-        J3_df.loc[self.ybusarr[k].index, self.ybusarr[k].index] = -1 * self.x[k + self.plength] * abs(self.ybus[k][n]) * self.x[n + self.plength] * np.cos(np.rad2deg(self.x[k]) - np.rad2deg(self.x[n]) - np.rad2deg(cmath.phase(self.ybus[k][n])))
-        J3_df.loc[self.ybusarr[n].index, self.ybusarr[k].index] = -1 * self.x[n + self.plength] * abs(self.ybus[n][k]) * self.x[k + self.plength] * np.sin(np.rad2deg(self.x[n]) - np.rad2deg(self.x[k]) - np.rad2deg(cmath.phase(self.ybus[n][k])))
-        J3_df.loc[self.ybusarr[n], self.ybusarr[n]] =
-        ##check to see if this saves y as a variable
-        self.J3 = J3_df
-
-    def calc_J4(self, k, n):                    #IF THIS ISNT WORKING CHECK YOUR USE OF rad2deg function... should prob only be on outside!
-        J4_df = pd.DataFrame()
-        J4_df.loc[self.ybusarr[k].index, self.ybusarr[k].index] =
-        J4_df.loc[self.ybusarr[k].index, self.ybusarr[n].index] = self.x[k + self.plength] * abs(self.ybus[k][n]) * np.sin(np.rad2deg(self.x[k]) - np.rad2deg(self.x[n]) - np.rad2deg(cmath.phase(self.ybus[k][n])))
-        J4_df.loc[self.ybusarr[n].index, self.ybusarr[k].index] = self.x[n + self.plength] * abs(self.ybus[n][k]) * np.sin(np.rad2deg(self.x[n]) - np.rad2deg(self.x[k]) - np.rad2deg(cmath.phase(self.ybus[n][k])))
-        J4_df.loc[self.ybusarr[n], self.ybusarr[n]] =
-        ##check to see if this saves y as a variable
-        self.J4 = J4_df
-
-
-
-
-
-        # vector of every P, Q
-
-        #find pk = p - px
-'''
