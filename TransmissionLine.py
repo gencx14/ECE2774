@@ -9,6 +9,7 @@ class TransmissionLine:
         self.name = name
         self.bus1 = bus1
         self.bus2 = bus2
+        self.y = None
         self.buses = [self.bus1, self.bus2]
         self.data = lineData
         self.bases = bases
@@ -30,6 +31,15 @@ class TransmissionLine:
         ypu_df.loc[self.bus2, self.bus2] = self.yseriesPu + self.halfYshuntPu
 ##check to see if this saves y as a variable
         self.y = ypu_df
+
+    def calc_vdf(self):
+        vpu_df = pd.DataFrame()
+        vpu_df.loc[self.bus1, self.bus1] = self.yseriesPu + self.halfYshuntPu
+        vpu_df.loc[self.bus1, self.bus2] = -1 * (self.yseriesPu)
+        vpu_df.loc[self.bus2, self.bus1] = -1 * (self.yseriesPu)
+        vpu_df.loc[self.bus2, self.bus2] = self.yseriesPu + self.halfYshuntPu
+        ##check to see if this saves y as a variable
+        self.v = vpu_df
 
 
 

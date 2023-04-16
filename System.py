@@ -22,6 +22,7 @@ class System:
     def __init__(self, name: str, pbase, vbase):
         self.name: str = name
         self.ybus = None
+        self.Imatrix = None
         self.bases = BaseValues(pbase, vbase)  # check on this if it gets messed up.
         # makes a list of the bus order and ensures that they are entered as strings
         self.buses_order: List[str] = list()

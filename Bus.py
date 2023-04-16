@@ -1,3 +1,5 @@
+import cmath
+
 class Bus:
     #Class Attribute
     busCount = 0
@@ -9,6 +11,7 @@ class Bus:
         self.name = name
         self.type = None
         self.vk = None
+        self.vdf = None
         self.delta1 = None
         self.pk = None
         self.qk = None
@@ -27,6 +30,15 @@ class Bus:
             return
         else:
             exit("Incorrect Bus Input Values for " + self.name)
+
+    def calc_vdf(self):
+        vpu_df = pd.DataFrame()
+        vpu_df.loc[self.bus1, self.bus1] = cmath.rect(self.bus1.vk, self.bus1.delta1)
+        vpu_df.loc[self.bus1, self.bus2] = cmath.rect(self.bus1.vk, self.bus1.delta1) - cmath.rect(self.bus2.vk, self.bus2.delta1)
+        vpu_df.loc[self.bus2, self.bus1] = cmath.rect(self.bus2.vk, self.bus2.delta1)
+        vpu_df.loc[self.bus2, self.bus2] = cmath.rect(self.bus2.vk, self.bus2.delta1) - cmath.rect(self.bus1.vk, self.bus1.delta1)
+        ##check to see if this saves y as a variable
+        self.vdf = vpu_df
 
 
 
