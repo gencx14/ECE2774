@@ -48,6 +48,12 @@ class PowerFlow:
         # The new x vector
         self.x_new = np.zeros((len(self.x), 1))
 
+        # tolerance of the system
+        self.tolerance = 0
+
+        # test value to check number of iterations to solve power flow
+        self.tester = 0
+
     def fill_y(self):
         k = 0
         for w in range(2):
@@ -260,3 +266,33 @@ class PowerFlow:
                         self.x_new[k] = self.x[k] + self.dx[i]
                         k = k + 1
                         i = i + 1
+
+    def set_tolerance(self, tolerance):
+        self.tolerance = tolerance
+
+    def Newton_Raphson(self):
+
+        # calculating change in y, reset f_x vector -> without resetting f_x, there is an out-of-bounds indexing issue
+        self.f_x = np.zeros(((2 * self.N), 1))
+
+        self.power_mismatch()
+
+        # if mismatch is within tolerance, end recursion, calculate necessary values
+        if np.amax(abs(self.dy_x)) < self.tolerance:
+            print(self.tester)
+            return
+
+        else:
+            # building Jacobian
+            self.jacobian()
+
+            # calculating change in x
+            self.calculate_mismatch()
+
+            # updating x to the new value
+            self.x = self.x_new
+
+            self.tester += 1
+
+            # running Newton Raphson again
+            return self.Newton_Raphson()
