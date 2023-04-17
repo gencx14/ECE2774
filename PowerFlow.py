@@ -1,4 +1,5 @@
 import numpy as np
+import cmath as cmath
 from Ybus import Ybus
 from Bus import Bus
 from Network import Network
@@ -51,8 +52,7 @@ class PowerFlow:
         # tolerance of the system
         self.tolerance = 0
 
-        # test value to check number of iterations to solve power flow
-        self.tester = 0
+        self.I_flow = np.zeros((self.N, self.N), dtype=complex)
 
     def fill_y(self):
         k = 0
@@ -69,14 +69,13 @@ class PowerFlow:
                     self.y[k] = self.network.buses[key].Q / self.base
                     k = k + 1
 
-
     def flat_start(self):
         # fills x vector with 0.0 for deltas and 1.0 for voltages
         for k in range(len(self.x)):
             if k <= 6:
-                self.x[k] = 0
+                self.x[k] = 0.0
             else:
-                self.x[k] = 1.0
+                self.x[k] = 1.00
 
     # Uses power injection equations to fill f(x), then calculates power mismatch
     def power_mismatch(self):
@@ -279,7 +278,6 @@ class PowerFlow:
 
         # if mismatch is within tolerance, end recursion, calculate necessary values
         if np.amax(abs(self.dy_x)) < self.tolerance:
-            print(self.tester)
             return
 
         else:
@@ -292,7 +290,20 @@ class PowerFlow:
             # updating x to the new value
             self.x = self.x_new
 
-            self.tester += 1
-
             # running Newton Raphson again
             return self.Newton_Raphson()
+
+    def output_voltages(self):
+        i = 0
+        print("The voltages and angles at the buses in order are:\n")
+        while i < self.N:
+            print("V" + str(i+1) + "= " + str(self.x[i+self.N]) + " at an angle d" + str(i+1) + "= " + str(self.x[i]))
+            i = i + 1
+        print(cmath.rect(self.x[1+self.N], self.x[1]) - cmath.rect(self.x[3 + self.N], self.x[3]))
+
+    def calculate_current_flow(self):
+        for i in range(self.N):
+            for j in range(self.N):
+                self.I_flow[i][j] = (cmath.rect(self.x[j + self.N][0], self.x[j][0]) - cmath.rect(self.x[i + self.N][0], self.x[i][0])) * self.y_matrix[i][j]
+
+        print()
