@@ -13,7 +13,7 @@ class Bus:
         self.P = 0
         self.Q = 0
 
-    def set_bus_voltage(self, voltage):     # function to set voltage of a bus
+    def set_bus_voltage(self, voltage):     # function to set voltage of a bus in per unit
         self.voltage = voltage
 
     def set_bus_type(self, bustype):   # sets the type of bus for power flow
@@ -22,8 +22,8 @@ class Bus:
     def set_delta(self, delta):     # sets the delta of the bus
         self.delta = delta
 
-    def set_p(self, p):     # sets the P of the bus
-        self.P = p
+    def set_p(self, p):     # sets the P of the bus in MW
+        self.P = p * 10**6
 
-    def set_q(self, q):     # sets the Q of the bus
-        self.Q = q
+    def set_q(self, q):     # sets the Q of the bus in Mvar
+        self.Q = q * 10**6

@@ -12,7 +12,13 @@ class PowerFlow:
         self.N = Bus.count
 
         # power base of system
-        self.base = 100
+        self.sbase = 100 * 10**6
+
+        # voltage base of system
+        self.vbase = 230 * 10**3
+
+        # current base
+        self.ibase = self.sbase / (self.vbase * np.sqrt(3))
 
         self.network = network
 
@@ -52,7 +58,17 @@ class PowerFlow:
         # tolerance of the system
         self.tolerance = 0
 
+        # matrix to store current flow between buses
         self.I_flow = np.zeros((self.N, self.N), dtype=complex)
+
+        # loss in a line
+        self.line_loss = 0
+
+        # loss in a transformer
+        self.t_loss = 0
+
+        # total losses in the system
+        self.total_losses = 0
 
     def fill_y(self):
         k = 0
@@ -61,12 +77,12 @@ class PowerFlow:
                 if self.network.buses[key].bustype == 1:
                     continue
                 elif k < 7:
-                    self.y[k] = self.network.buses[key].P / self.base
+                    self.y[k] = self.network.buses[key].P / self.sbase
                     k = k + 1
                 elif k >= 7 and self.network.buses[key].bustype == 3:
                     continue
                 else:
-                    self.y[k] = self.network.buses[key].Q / self.base
+                    self.y[k] = self.network.buses[key].Q / self.sbase
                     k = k + 1
 
     def flat_start(self):
@@ -295,15 +311,23 @@ class PowerFlow:
 
     def output_voltages(self):
         i = 0
-        print("The voltages and angles at the buses in order are:\n")
+        print("The voltages and angles at the buses in order are:")
         while i < self.N:
             print("V" + str(i+1) + "= " + str(self.x[i+self.N]) + " at an angle d" + str(i+1) + "= " + str(self.x[i]))
             i = i + 1
-        print(cmath.rect(self.x[1+self.N], self.x[1]) - cmath.rect(self.x[3 + self.N], self.x[3]))
 
     def calculate_current_flow(self):
         for i in range(self.N):
             for j in range(self.N):
-                self.I_flow[i][j] = (cmath.rect(self.x[j + self.N][0], self.x[j][0]) - cmath.rect(self.x[i + self.N][0], self.x[i][0])) * self.y_matrix[i][j]
+                self.I_flow[i][j] = self.ibase * ((cmath.rect(self.x[j + self.N][0], self.x[j][0]) - cmath.rect(self.x[i + self.N][0], self.x[i][0])) * self.y_matrix[i][j])
+        print(abs(self.I_flow[0][1]))
+        print(abs(self.I_flow[1][2]))
+        print(abs(self.I_flow[1][3]))
+        print(abs(self.I_flow[2][4]))
+        print(abs(self.I_flow[3][4]))
+        print(abs(self.I_flow[3][5]))
+        print(abs(self.I_flow[4][5]))
+        print(abs(self.I_flow[5][6]))
 
-        print()
+    def calculate_losses(self):
+        pass
