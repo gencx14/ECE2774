@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 
 from System import System
@@ -299,8 +301,8 @@ class PowerFlow:
         # 2. form large V matrix in same fashion as you did with ybus
         voltmatrix_obj = VoltageMatrix(self.system)
         voltmatrix = voltmatrix_obj.voltagematrix
-        # 3. I = V*Ybus
-        Imatrix = voltmatrix * self.ybus
+        # 3. I = V*Ybus* -
+        Imatrix = voltmatrix * self.ybus * -1 * cmath.sqrt(-1)
         self.system.Imatrix = Imatrix
         # Inn = total current injected into node
         # Ink = total current from bus n to bus k (line current) --> should stick with the positive value
