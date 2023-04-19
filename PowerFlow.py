@@ -41,6 +41,8 @@ class PowerFlow:
         self.Newton_Raphson()
         self.updateBusses()
         self.calcCurrent()
+        self.calcpower()
+        self.calc_power_loss()
         print()
         #  fill y for power equation from bus information
 
@@ -300,12 +302,54 @@ class PowerFlow:
         # 1. form V matrix of each bus
         # 2. form large V matrix in same fashion as you did with ybus
         voltmatrix_obj = VoltageMatrix(self.system)
-        voltmatrix = voltmatrix_obj.voltagematrix
+        self.system.Vmatrix = voltmatrix_obj.voltagematrix
         # 3. I = V*Ybus* -
-        Imatrix = voltmatrix * self.ybus * -1 * cmath.sqrt(-1)
+        Imatrix = self.system.Vmatrix * self.ybus
         self.system.Imatrix = Imatrix
         # Inn = total current injected into node
         # Ink = total current from bus n to bus k (line current) --> should stick with the positive value
+
+    def calcpower(self):
+        self.system.Smatrix = self.system.Vmatrix * np.conjugate(self.system.Imatrix)
+        print()
+
+# Current Limitation!!!
+# if there are 2 lines connected from bus a to bus b then this does not seperate the powers into each line.
+    def calc_power_loss(self):
+        Rmatrix = np.real(-1/self.ybus)
+        Zmatrix = np.divide(-1, self.ybus)
+        Zmatrix[~np.isfinite(Zmatrix)] = 0
+        Xmatrix = np.imag(Zmatrix)
+        RmatrixMask = np.isinf(Rmatrix)
+        Rmatrix[RmatrixMask] = 0
+        # Imatrixpumags = np.absolute(self.system.Imatrix) * np.sign(np.real(self.system.Imatrix))
+        self.system.Rmatrix = Rmatrix
+        self.system.Xmatrix = Xmatrix
+        self.system.Plossmatrixpu = np.abs(self.system.Imatrix) ** 2 * self.system.Rmatrix
+        checkmePloss = np.real((((np.abs(self.system.Imatrix)) * self.system.bases.ibase) ** 2) * self.system.Rmatrix)
+        #plossmatrix = np.real(self.system.Plossmatrixpu) # * self.system.bases.pbase
+        #qlossmatrix = np.imag(self.system.Plossmatrixpu) * self.system.bases.pbase
+
+        #testmatrixfull = testmatrix * self.system.bases.pbase
+        #testmask = np.isinf(testmatrix)
+        #testmatrix[testmask] = 0
+        # ploss = self.system.Plossmatrixpu * self.system.bases.pbase
+        print()
+
+
+        for element_name, element in self.system.y_elements.items():
+            for row in element.buses:
+                for col in element.buses:
+                    index_row = self.system.buses[row].index
+                    index_col = self.system.buses[col].index
+
+                    if index_row == index_col:
+                        self.voltagematrix[index_row, index_col] = complex(cmath.rect(self.system.buses[row].vk, self.system.buses[row].delta1))
+                    else:
+                        self.voltagematrix[index_row, index_col] = complex(cmath.rect(self.system.buses[row].vk, self.system.buses[row].delta1) - cmath.rect(self.system.buses[col].vk, self.system.buses[col].delta1))
+                self
+
+
 
 
 
