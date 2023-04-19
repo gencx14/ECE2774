@@ -61,12 +61,6 @@ class PowerFlow:
         # matrix to store current flow between buses
         self.I_flow = np.zeros((self.N, self.N), dtype=complex)
 
-        # loss in a line
-        self.line_losses = np.zeros((self.N, 1), dtype=complex)
-
-        # loss in a transformer
-        self.t_loss = 0
-
         # total losses in the system
         self.total_losses = 0
 
@@ -317,9 +311,10 @@ class PowerFlow:
             i = i + 1
 
     def calculate_current_flow(self):
+        # Calculating per unit current
         for i in range(self.N):
             for j in range(self.N):
-                self.I_flow[i][j] = self.ibase * ((cmath.rect(self.x[j + self.N][0], self.x[j][0]) - cmath.rect(self.x[i + self.N][0], self.x[i][0])) * self.y_matrix[i][j])
+                self.I_flow[i][j] = ((cmath.rect(self.x[j + self.N][0], self.x[j][0]) - cmath.rect(self.x[i + self.N][0], self.x[i][0])) * self.y_matrix[i][j])
 
         # putting current values into proper lines
         self.network.lines['L1'].set_current(self.I_flow[1][3])
@@ -329,11 +324,21 @@ class PowerFlow:
         self.network.lines['L5'].set_current(self.I_flow[4][5])
         self.network.lines['L6'].set_current(self.I_flow[3][4])
 
-        for key in self.network.lines:
-            print(abs(self.network.lines[key].current))
+        '''for key in self.network.lines:
+            print(abs(self.network.lines[key].current))'''
 
     def calculate_losses(self):
+        # Calculate losses in transmission lines in pu
         for key in self.network.lines:
-            p_loss = 3 * (abs(self.network.lines[key].current)/self.ibase) ** 2 * self.network.lines[key].R * self.network.lines[key].z_rated
-            self.network.lines[key].set_ploss(p_loss)
+            p_loss = (abs(self.network.lines[key].current)) ** 2 * self.network.lines[key].R
+            self.network.lines[key].set_ploss(p_loss * 100)
             self.total_losses += p_loss
+
+        # Calculate secondary currents in transformers
+        self.network.transformers['T1'].i_secondary = abs(self.network.lines['L1'].current) + abs(self.network.lines['L2'].current)
+        self.network.transformers['T2'].i_secondary = abs(self.network.lines['L4'].current) + abs(self.network.lines['L5'].current)
+
+        # Calculating power loss in transformers
+        self.network.transformers['T1'].loss = self.network.transformers['T1'].i_secondary ** 2 * (1/self.network.transformers['T1'].y).real
+        self.network.transformers['T2'].loss = self.network.transformers['T2'].i_secondary ** 2 * (1 / self.network.transformers['T2'].y).real
+        self.total_losses += self.network.transformers['T1'].loss + self.network.transformers['T2'].loss
