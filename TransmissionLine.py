@@ -19,3 +19,11 @@ class TransmissionLine:
         self.X = (self.j * data.L * self.length * data.w) / TransmissionLine.z_rated    # Reactance of line in pu
         self.B = self.j * data.C * self.length * data.w / TransmissionLine.y_rated      # Shunt admittance of line in pu
         self.y = 1/(self.R + self.X)     # Admittance of line
+        self.current = None
+        self.loss = None
+
+    def set_current(self, i):
+        self.current = i
+
+    def set_ploss(self, ploss):
+        self.loss = ploss

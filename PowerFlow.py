@@ -62,7 +62,7 @@ class PowerFlow:
         self.I_flow = np.zeros((self.N, self.N), dtype=complex)
 
         # loss in a line
-        self.line_loss = 0
+        self.line_losses = np.zeros((self.N, 1), dtype=complex)
 
         # loss in a transformer
         self.t_loss = 0
@@ -313,21 +313,27 @@ class PowerFlow:
         i = 0
         print("The voltages and angles at the buses in order are:")
         while i < self.N:
-            print("V" + str(i+1) + "= " + str(self.x[i+self.N]) + " at an angle d" + str(i+1) + "= " + str(self.x[i]))
+            print("V" + str(i+1) + " = " + str(self.x[i+self.N]) + " at an angle d" + str(i+1) + " = " + str(self.x[i]))
             i = i + 1
 
     def calculate_current_flow(self):
         for i in range(self.N):
             for j in range(self.N):
                 self.I_flow[i][j] = self.ibase * ((cmath.rect(self.x[j + self.N][0], self.x[j][0]) - cmath.rect(self.x[i + self.N][0], self.x[i][0])) * self.y_matrix[i][j])
-        print(abs(self.I_flow[0][1]))
-        print(abs(self.I_flow[1][2]))
-        print(abs(self.I_flow[1][3]))
-        print(abs(self.I_flow[2][4]))
-        print(abs(self.I_flow[3][4]))
-        print(abs(self.I_flow[3][5]))
-        print(abs(self.I_flow[4][5]))
-        print(abs(self.I_flow[5][6]))
+
+        # putting current values into proper lines
+        self.network.lines['L1'].set_current(self.I_flow[1][3])
+        self.network.lines['L2'].set_current(self.I_flow[1][2])
+        self.network.lines['L3'].set_current(self.I_flow[2][4])
+        self.network.lines['L4'].set_current(self.I_flow[3][5])
+        self.network.lines['L5'].set_current(self.I_flow[4][5])
+        self.network.lines['L6'].set_current(self.I_flow[3][4])
+
+        for key in self.network.lines:
+            print(abs(self.network.lines[key].current))
 
     def calculate_losses(self):
-        pass
+        for key in self.network.lines:
+            p_loss = 3 * (abs(self.network.lines[key].current)/self.ibase) ** 2 * self.network.lines[key].R * self.network.lines[key].z_rated
+            self.network.lines[key].set_ploss(p_loss)
+            self.total_losses += p_loss
