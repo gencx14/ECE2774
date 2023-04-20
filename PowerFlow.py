@@ -342,3 +342,8 @@ class PowerFlow:
         self.network.transformers['T1'].loss = self.network.transformers['T1'].i_secondary ** 2 * (1/self.network.transformers['T1'].y).real
         self.network.transformers['T2'].loss = self.network.transformers['T2'].i_secondary ** 2 * (1 / self.network.transformers['T2'].y).real
         self.total_losses += self.network.transformers['T1'].loss + self.network.transformers['T2'].loss
+
+    def flow_of_power(self):
+        # Calculate the power flowing through each line using V * I and taking the real part of the result
+        pass
+    
