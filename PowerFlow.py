@@ -345,5 +345,8 @@ class PowerFlow:
 
     def flow_of_power(self):
         # Calculate the power flowing through each line using V * I and taking the real part of the result
-        pass
+        for key in self.network.lines:
+            self.network.lines[key].power_flow = np.real((self.network.buses[self.network.lines[key].bus1].voltage -
+                                                          self.network.buses[self.network.lines[key].bus2].voltage) *
+                                                         self.network.lines[key].current)
     
