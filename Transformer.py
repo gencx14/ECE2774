@@ -12,6 +12,7 @@ class Transformer:
         self.bus2 = bus2
         self.buses = [self.bus1, self.bus2]
         self.data = tx_data
+        self.zPu = self.data.zPu
         self.calc_y()
 
     def calc_y(self):

@@ -69,7 +69,7 @@ class System:
             self.buses[bus1].setBusVoltage(voltage)
             System.componentCount += 1
 
-    def add_conductor(self, name, outerDiameter, gmr, rAC, ampacity=None):
+    def add_conductor(self, name, outerDiameter, gmr, rAC, ampacity):
         if name not in self.conductors.keys():
             self.conductors[name] = Conductor(name, outerDiameter, gmr, rAC, ampacity)
 

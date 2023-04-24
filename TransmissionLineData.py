@@ -11,6 +11,7 @@ class TransmissionLineData:
     def __init__(self, name, bundle: Bundle, geometry: Geometry, conductor: Conductor):
         self.name = name
         self.geom = geometry
+        self.conductor = conductor
         self.deq = self.geom.getdeq()
         self.cPrime = 2*cmath.pi*(8.854*10**(-12))/cmath.log(self.deq / bundle.getdsc()) #units of Ferads per meter  C'   ***** Check your units
         self.lPrime = (2*10**(-7)) * cmath.log(self.deq / bundle.getdsl()) #inductance per meter H/m L'
