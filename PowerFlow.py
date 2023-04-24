@@ -373,6 +373,8 @@ class PowerFlow:
         self.network.lines['L5'].power_flow = np.real(self.power_flow[4][5])
         self.network.lines['L6'].power_flow = np.real(self.power_flow[3][4])
 
-
+    def slack_pv_calculations(self):
+        # Calculating P and Q of slack bus
+        
 
     
