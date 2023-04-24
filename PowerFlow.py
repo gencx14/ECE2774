@@ -64,6 +64,9 @@ class PowerFlow:
         # total losses in the system
         self.total_losses = 0
 
+        # power flowing through lines
+        self.power_flow = np.zeros((self.N, self.N), dtype=complex)
+
     def fill_y(self):
         k = 0
         for w in range(2):
@@ -309,6 +312,20 @@ class PowerFlow:
         while i < self.N:
             print("V" + str(i+1) + " = " + str(self.x[i+self.N]) + " at an angle d" + str(i+1) + " = " + str(self.x[i]))
             i = i + 1
+        k = 0
+        for key in self.network.buses:
+            if self.network.buses[key].bustype == 1:
+                k = k + 1
+                continue
+
+            elif self.network.buses[key].bustype == 3:
+                self.network.buses[key].delta = self.x[k]
+                k = k + 1
+
+            else:
+                self.network.buses[key].voltage = self.x[k + self.N]
+                self.network.buses[key].delta = self.x[k]
+                k = k + 1
 
     def calculate_current_flow(self):
         # Calculating per unit current
@@ -344,9 +361,18 @@ class PowerFlow:
         self.total_losses += self.network.transformers['T1'].loss + self.network.transformers['T2'].loss
 
     def flow_of_power(self):
-        # Calculate the power flowing through each line using V * I and taking the real part of the result
-        for key in self.network.lines:
-            self.network.lines[key].power_flow = np.real((self.network.buses[self.network.lines[key].bus1].voltage -
-                                                          self.network.buses[self.network.lines[key].bus2].voltage) *
-                                                         self.network.lines[key].current)
+        # Calculate the power flowing through each line using and taking the real part of the result
+        for i in range(self.N):
+            for j in range(self.N):
+                self.power_flow[i][j] = self.x[i + self.N] * self.I_flow[i][j].conjugate()
+        # Assigning values from self.power_flow to the proper lines
+        self.network.lines['L1'].power_flow = np.real(self.power_flow[1][3])
+        self.network.lines['L2'].power_flow = np.real(self.power_flow[1][2])
+        self.network.lines['L3'].power_flow = np.real(self.power_flow[2][4])
+        self.network.lines['L4'].power_flow = np.real(self.power_flow[3][5])
+        self.network.lines['L5'].power_flow = np.real(self.power_flow[4][5])
+        self.network.lines['L6'].power_flow = np.real(self.power_flow[3][4])
+
+
+
     
