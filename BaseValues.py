@@ -5,6 +5,8 @@ class BaseValues:
         self.vbase = vbase
         self.zbase = self.vbase**2/self.pbase
         self.ybase = 1 / self.zbase
+        self.ibase = self.pbase / (self.vbase * cmath.sqrt(3))
+
 
 
 

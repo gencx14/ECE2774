@@ -16,8 +16,8 @@ class TransformerData:
         self.txZpu = None
         self.txXpu = None
         self.txRpu = None
-        self.txZpu = None
         self.makepu()
+        self.zPu = self.txZpu
 
 
     def makepu(self):  # is it vlow or v primary????

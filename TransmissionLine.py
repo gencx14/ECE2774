@@ -21,6 +21,8 @@ class TransmissionLine:
         self.halfYshunt = self.totalYshunt / 2
         self.halfYshuntPu = self.halfYshunt / bases.ybase
         self.calc_y()
+        self.zPu = self.zseriesPu
+        self.currentOverRating = None
 
     def calc_y(self):
 

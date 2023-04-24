@@ -3,6 +3,7 @@ import math
 import numpy as np
 
 from System import System
+from TransmissionLine import TransmissionLine
 from VoltageMatrix import VoltageMatrix
 import cmath
 
@@ -40,7 +41,10 @@ class PowerFlow:
         self.step2_x_array_flatstart()
         self.Newton_Raphson()
         self.updateBusses()
-        self.calcCurrent()
+        self.getvalues()
+        #self.calcCurrent()
+        #self.calcpower()
+        #self.calc_power_loss()
         print()
         #  fill y for power equation from bus information
 
@@ -239,7 +243,7 @@ class PowerFlow:
         self.delta_x = np.dot(np.linalg.inv(self.Jacob), self.delta_y)
         #self.x = self.x + self.delta_x
 
-        # I am not sure what this part does, and need to speak with Paolo about it
+
         m_p = 0
         m_q = 0
 
@@ -296,16 +300,56 @@ class PowerFlow:
         self.printme += 1
         return self.Newton_Raphson()
 
-    def calcCurrent(self):
-        # 1. form V matrix of each bus
-        # 2. form large V matrix in same fashion as you did with ybus
-        voltmatrix_obj = VoltageMatrix(self.system)
-        voltmatrix = voltmatrix_obj.voltagematrix
-        # 3. I = V*Ybus* -
-        Imatrix = voltmatrix * self.ybus * -1 * cmath.sqrt(-1)
-        self.system.Imatrix = Imatrix
-        # Inn = total current injected into node
-        # Ink = total current from bus n to bus k (line current) --> should stick with the positive value
+    def getvalues(self):
+        self.system.Plosses = np.zeros(len(self.system.y_elements), dtype=complex)
+        i = 0
+        slackS = 0
+        for element_name, element in self.system.y_elements.items():
+            # for row in element.buses:
+            #  for col in element.buses:
+            # index_row = self.system.buses[row].index
+            # index_col = self.system.buses[col].index
+            self.system.y_elements[element_name].voltDrop = (cmath.rect(self.system.buses[element.buses[0]].vk, self.system.buses[element.buses[0]].delta1) - cmath.rect(self.system.buses[element.buses[1]].vk, self.system.buses[element.buses[1]].delta1))
+            self.system.y_elements[element_name].lineCurrent = (1 / element.zPu) * element.voltDrop
+            self.system.y_elements[element_name].powerLosses = abs(element.lineCurrent) ** 2 * element.zPu
+            self.system.y_elements[element_name].powerSending_S = self.system.buses[element.buses[0]].vk * element.lineCurrent.conjugate()
+            self.system.y_elements[element_name].powerRecieving_S = self.system.buses[element.buses[1]].vk * element.lineCurrent.conjugate()
+            self.system.Plosses[i] = element.powerLosses
+            typebus1 = self.system.buses[element.buses[0]].type
+            typebus2 = self.system.buses[element.buses[1]].type
 
+            # find slack P and Q
+            if typebus1 == "Slack":
+                slackS += element.lineCurrent.conjugate() * self.system.buses[element.buses[0]].vk
+                self.system.buses[element.buses[0]].pk = np.real(slackS)
+                self.system.buses[element.buses[0]].qk = np.imag(slackS)
+            # I am wondering if this should actually be -= instead of +=
+            elif typebus2 == "Slack":
+                slackS += element.lineCurrent.conjugate() * self.system.buses[element.buses[1]].vk
+                self.system.buses[element.buses[1]].pk = np.real(slackS)
+                self.system.buses[element.buses[1]].qk = np.imag(slackS)
+            # find PV bus delta and Q
+            elif typebus1 == "VC":
+                #P = sqrt(3) V I cos delta
+                delta = np.arccos(self.system.buses[element.buses[0]].pk / (self.system.buses[element.buses[0]].vk * abs(element.lineCurrent)))
+                q = self.system.buses[element.buses[0]].vk * abs(element.lineCurrent) * np.sin(delta)
+                self.system.buses[element.buses[0]].delta1 = delta
+                self.system.buses[element.buses[0]].qk = q
+            elif typebus2 == "VC":
+                #P = sqrt(3) V I cos delta
+                delta = np.arccos(self.system.buses[element.buses[1]].pk / (self.system.buses[element.buses[1]].vk * abs(element.lineCurrent)))
+                q = self.system.buses[element.buses[1]].vk * abs(element.lineCurrent) * np.sin(delta)
+                self.system.buses[element.buses[1]].delta1 = delta
+                self.system.buses[element.buses[1]].qk = q
+        # check ampacity if the current is more than the line is rated for turn currentOverRating to True else turn it to false
+            if isinstance(element, TransmissionLine):
+                currentRating = element.data.conductor.ampacity * self.system.bundles['main'].size / self.system.bases.ibase
+                if float(abs(currentRating)) < (float(abs(element.lineCurrent))):
+                    self.system.y_elements[element_name].currentOverRating = True
+                else:
+                    self.system.y_elements[element_name].currentOverRating = False
+
+            i = i + 1
+        self.system.totalPloss = np.sum(self.system.Plosses)
 
 

@@ -22,7 +22,9 @@ class System:
     def __init__(self, name: str, pbase, vbase):
         self.name: str = name
         self.ybus = None
+        self.Vmatrix = None
         self.Imatrix = None
+        self.Smatrix = None
         self.bases = BaseValues(pbase, vbase)  # check on this if it gets messed up.
         # makes a list of the bus order and ensures that they are entered as strings
         self.buses_order: List[str] = list()
@@ -67,7 +69,7 @@ class System:
             self.buses[bus1].setBusVoltage(voltage)
             System.componentCount += 1
 
-    def add_conductor(self, name, outerDiameter, gmr, rAC, ampacity=None):
+    def add_conductor(self, name, outerDiameter, gmr, rAC, ampacity):
         if name not in self.conductors.keys():
             self.conductors[name] = Conductor(name, outerDiameter, gmr, rAC, ampacity)
 

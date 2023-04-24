@@ -1,9 +1,9 @@
 from System import System
 from Solution import Solution
 
-system = System("system", 100000000, 230000)
+system = System("system", 100e6, 230e3)
 system.add_geometry("geometry1", -19.5, 30, 0, 30, 19.5, 30)
-system.add_conductor("partridge", 0.642, 0.0217, 0.385)
+system.add_conductor("partridge", 0.642, 0.0217, 0.385, 460)
 system.add_bundle("main", 2, 1.5, system.conductors["partridge"])
 system.add_transmissionLineData("mainLine", system.bundles["main"], system.geometries["geometry1"], system.conductors["partridge"])
 system.add_transmissionLine("L1", "bus2", "bus4", system.transmissionlineDataItems["mainLine"], 10)
