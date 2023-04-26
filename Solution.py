@@ -1,6 +1,7 @@
 from System import System
 from YbusFormation import YbusFormation
 from PowerFlow import PowerFlow
+from SequenceNetwork import SequenceNetwork
 class Solution:
     def __init__(self, system: System):
         self.system = system
@@ -8,6 +9,7 @@ class Solution:
         self.ybus = self.ybusobj.ymatrix
         self.bus_voltages = []
         self.pf = PowerFlow(self.ybus, self.system)
+        self.Sequence = SequenceNetwork(self.system)
 
     def do_power_flow(self):
         """
