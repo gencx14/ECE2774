@@ -327,6 +327,21 @@ class PowerFlow:
                 self.network.buses[key].delta = self.x[k]
                 k = k + 1
 
+    # This function will set the voltages and angles for the buses based on the previous calculations
+    def update_buses(self):
+        k = 0
+        for key in self.network.buses:
+            if self.network.buses[key].bustype == 1:
+                k = k + 1
+                continue
+            elif self.network.buses[key].bustype == 3 and k <= 6:
+                self.network.buses[key].set_delta(self.x[k][0])
+                k = k + 1
+            else:
+                self.network.buses[key].set_delta(self.x[k][0])
+                self.network.buses[key].set_bus_voltage(self.x[k + self.N][0])
+                k = k + 1
+
     def calculate_current_flow(self):
         # Calculating per unit current
         for i in range(self.N):
@@ -366,15 +381,21 @@ class PowerFlow:
             for j in range(self.N):
                 self.power_flow[i][j] = self.x[i + self.N] * self.I_flow[i][j].conjugate()
         # Assigning values from self.power_flow to the proper lines
-        self.network.lines['L1'].power_flow = np.real(self.power_flow[1][3])
-        self.network.lines['L2'].power_flow = np.real(self.power_flow[1][2])
-        self.network.lines['L3'].power_flow = np.real(self.power_flow[2][4])
-        self.network.lines['L4'].power_flow = np.real(self.power_flow[3][5])
-        self.network.lines['L5'].power_flow = np.real(self.power_flow[4][5])
-        self.network.lines['L6'].power_flow = np.real(self.power_flow[3][4])
+        self.network.lines['L1'].power_flow = abs(np.real(self.power_flow[1][3]))
+        self.network.lines['L2'].power_flow = abs(np.real(self.power_flow[1][2]))
+        self.network.lines['L3'].power_flow = abs(np.real(self.power_flow[2][4]))
+        self.network.lines['L4'].power_flow = abs(np.real(self.power_flow[3][5]))
+        self.network.lines['L5'].power_flow = abs(np.real(self.power_flow[4][5]))
+        self.network.lines['L6'].power_flow = abs(np.real(self.power_flow[3][4]))
+
+        # Power in each line is correct, checked with this loop
+        '''for key in self.network.lines:
+            print(self.network.lines[key].power_flow * 100)'''
 
     def slack_pv_calculations(self):
         # Calculating P and Q of slack bus
+        self.network.buses['bus1'].set_p(self.network.transformers['T1'].loss + self.network.lines['L1'].power_flow + self.network.lines['L2'].power_flow)
+        print(self.network.buses['bus1'].P)
         
 
     
