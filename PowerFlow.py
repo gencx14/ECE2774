@@ -370,10 +370,10 @@ class PowerFlow:
         self.network.transformers['T1'].i_secondary = abs(self.network.lines['L1'].current) + abs(self.network.lines['L2'].current)
         self.network.transformers['T2'].i_secondary = abs(self.network.lines['L4'].current) + abs(self.network.lines['L5'].current)
 
-        # Calculating power loss in transformers
-        self.network.transformers['T1'].loss = self.network.transformers['T1'].i_secondary ** 2 * (1/self.network.transformers['T1'].y).real
-        self.network.transformers['T2'].loss = self.network.transformers['T2'].i_secondary ** 2 * (1 / self.network.transformers['T2'].y).real
-        self.total_losses += self.network.transformers['T1'].loss + self.network.transformers['T2'].loss
+        # Calculating power loss in transformers in pu
+        self.network.transformers['T1'].ploss = self.network.transformers['T1'].i_secondary ** 2 * (1/self.network.transformers['T1'].y).real
+        self.network.transformers['T2'].ploss = self.network.transformers['T2'].i_secondary ** 2 * (1 / self.network.transformers['T2'].y).real
+        self.total_losses += self.network.transformers['T1'].ploss + self.network.transformers['T2'].ploss
 
     def flow_of_power(self):
         # Calculate the power flowing through each line using and taking the real part of the result
@@ -388,14 +388,25 @@ class PowerFlow:
         self.network.lines['L5'].power_flow = abs(np.real(self.power_flow[4][5]))
         self.network.lines['L6'].power_flow = abs(np.real(self.power_flow[3][4]))
 
+        self.network.lines['L1'].qflow = abs(np.imag(self.power_flow[1][3]))
+        self.network.lines['L2'].qflow = abs(np.imag(self.power_flow[1][2]))
+        self.network.lines['L3'].qflow = abs(np.imag(self.power_flow[2][4]))
+        self.network.lines['L4'].qflow = abs(np.imag(self.power_flow[3][5]))
+        self.network.lines['L5'].qflow = abs(np.imag(self.power_flow[4][5]))
+        self.network.lines['L6'].qflow = abs(np.imag(self.power_flow[3][4]))
+
         # Power in each line is correct, checked with this loop
         '''for key in self.network.lines:
             print(self.network.lines[key].power_flow * 100)'''
 
     def slack_pv_calculations(self):
         # Calculating P and Q of slack bus
-        self.network.buses['bus1'].set_p(self.network.transformers['T1'].loss + self.network.lines['L1'].power_flow + self.network.lines['L2'].power_flow)
-        print(self.network.buses['bus1'].P)
+        self.network.buses['bus1'].P = ((self.network.transformers['T1'].ploss + self.network.lines['L1'].power_flow + self.network.lines['L2'].power_flow) * self.sbase)
+        self.network.buses['bus1'].Q = ((self.network.lines['L1'].qflow + self.network.lines['L2'].qflow) * self.sbase)
+
+        # Calculating Q and delta of PV bus
+        self.network.buses['bus7'].Q = (self.network.lines['L4'].qflow + self.network.lines['L5'].qflow) * self.sbase
+        self.network.buses['bus7'].delta = np.rad2deg(self.x[6][0])
         
 
     

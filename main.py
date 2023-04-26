@@ -41,7 +41,7 @@ ybus_obj = Ybus('ybus1', network_obj)
 ybus_obj.fill_ybus_matrix()
 # ybus_obj.print_ybus_matrix()
 
-# setting bus types, and relevant parameters (key, type, voltage, delta, p, q)
+# setting bus types, and relevant parameters (key, type, voltage, delta, p, q), p and q in MW
 network_obj.set_bus_data('bus1', 1, 1, 0, 0, 0)
 network_obj.set_bus_data('bus2', 2, 0, 0, 0, 0)
 network_obj.set_bus_data('bus3', 2, 0, 0, -110, -50)

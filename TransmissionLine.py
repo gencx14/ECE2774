@@ -22,12 +22,16 @@ class TransmissionLine:
         self.current = None
         self.loss = None
         self.power_flow = None
+        self.qflow = None
 
     def set_current(self, i):
         self.current = i
 
     def set_ploss(self, ploss):
         self.loss = ploss
+
+    def set_qflow(self, qflow):
+        self.qflow = qflow
 
     def set_power_flow(self, flow):
         self.power_flow = flow

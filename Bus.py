@@ -22,8 +22,8 @@ class Bus:
     def set_delta(self, delta):     # sets the delta of the bus
         self.delta = delta
 
-    def set_p(self, p):     # sets the P of the bus in MW
-        self.P = p * 10**6
+    def set_p(self, p):     # takes value in MW converts to W
+        self.P = p * 10 ** 6
 
-    def set_q(self, q):     # sets the Q of the bus in Mvar
-        self.Q = q * 10**6
+    def set_q(self, q):     # takes value in Mvar converts to W
+        self.Q = q * 10 ** 6
