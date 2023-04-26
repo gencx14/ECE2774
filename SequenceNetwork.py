@@ -21,6 +21,7 @@ class SequenceNetworks:
             v_a = complex(bus.vk, bus.delta1)
             Vseq = np.zeros((3, 3), dtype=complex)
             Vseq = self.transformMatrix * v_a
+            jjj
 
 
 
