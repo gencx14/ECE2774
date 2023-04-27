@@ -67,6 +67,9 @@ class PowerFlow:
         # power flowing through lines
         self.power_flow = np.zeros((self.N, self.N), dtype=complex)
 
+        # ampacity of Partridge line per bundle number A * num
+        self.ampacity = 475 * self.network.line_data['Partridge'].n
+
     def fill_y(self):
         k = 0
         for w in range(2):
@@ -356,6 +359,10 @@ class PowerFlow:
         self.network.lines['L5'].set_current(self.I_flow[4][5])
         self.network.lines['L6'].set_current(self.I_flow[3][4])
 
+        for key in self.network.lines:
+            if self.network.lines[key].current * self.ibase >= self.ampacity:
+                print("The current in line " + key + " exceeds ampactiy for the Partridge line")
+
         '''for key in self.network.lines:
             print(abs(self.network.lines[key].current))'''
 
@@ -407,6 +414,3 @@ class PowerFlow:
         # Calculating Q and delta of PV bus
         self.network.buses['bus7'].Q = (self.network.lines['L4'].qflow + self.network.lines['L5'].qflow) * self.sbase
         self.network.buses['bus7'].delta = np.rad2deg(self.x[6][0])
-        
-
-    
