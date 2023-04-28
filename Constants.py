@@ -6,6 +6,9 @@ W = 2 * cmath.pi * FREQ
 j = complex(0, 1)
 #transformation constant in radians stored as a complex value
 ALPHA = cmath.exp((j * 120 * cmath.pi) / 180)
+#infinity
+INF = float('inf')
+
 
 
 
