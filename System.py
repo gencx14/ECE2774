@@ -62,11 +62,12 @@ class System:
             self.buses[bus] = Bus(bus)
             self.buses_order.append(bus)
 
-    def add_generator(self, name, voltage, bus1):
+    def add_generator(self, name, voltage, bus1, x1, x2, x0, Zg):
         if name not in self.generatorItems.keys():
-            self.generatorItems[name] = Generator(name, voltage, bus1, self.bases)
+            self.generatorItems[name] = Generator(name, voltage, bus1, x1, x2, x0, Zg)
             self.add_bus(bus1)
-            self.buses[bus1].setBusVoltage(voltage)
+            self.buses[bus1].vk = voltage
+            self.y_elements[name] = self.generatorItems[name]
             System.componentCount += 1
 
     def add_conductor(self, name, outerDiameter, gmr, rAC, ampacity):
@@ -90,10 +91,10 @@ class System:
             self.add_bus(bus2)
             System.componentCount += 1
 
-    def add_transformerData(self, name, sRated, vPrimary, vSecondary, zPctTransformer, xrRatio):
+    def add_transformerData(self, name, sRated, vPrimary, vSecondary, zPctTransformer, xrRatio, config: str, zga, zgb):
         if name not in self.transformerdataItems.keys():
             self.transformerdataItems[name] = TransformerData(name, sRated, vPrimary, vSecondary, zPctTransformer,
-                                                              xrRatio, self.bases)
+                                                              xrRatio, self.bases, config, zga, zgb)
 
     def add_transmissionLine(self, name: str, bus1, bus2, lineData: TransmissionLineData, length):
         if name not in self.transmissionlines.keys():
