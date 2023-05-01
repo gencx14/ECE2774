@@ -53,10 +53,26 @@ class TransformerData:
     def sequenceZYcalc(self):
         self.z1 = self.txZpu
         self.z2 = self.txZpu
-        self.z0 = 3 * self.Zg_a + self.txZpu + 3 * self.Zg_b
         self.y1 =1 / self.z1
         self.y2 = 1 / self.z2
-        self.y0 = 1 / self.z0
+        if self.Zg_a and self.Zg_b == Constants.INF:
+            warnings.warn(f'INVALID: You have choosen {self.name} to have no ground reference', TxZgWarning)
+        elif self.Zg_a == Constants.INF:
+            self.z0aa = Constants.INF
+            self.z0ab = Constants.INF
+            self.z0bb = self.txZpu + 3 * self.Zg_b
+        elif self.Zg_b == Constants.INF:
+            self.z0aa = 3 * self.Zg_a + self.txZpu
+            self.z0ab = Constants.INF
+            self.z0bb = Constants.INF
+        else:
+            self.z0aa = 3 * self.Zg_a + self.txZpu + 3 * self.Zg_b
+            self.z0ab = self.z0aa
+            self.z0bb = self.z0ab
+        self.y0aa = 1 / self.z0aa
+        self.y0ab = 1 / self.z0ab
+        self.y0bb = 1 / self.z0bb
+
         '''
         if self.Txconfiguration == "Y-Y":
             # Add Grounded Wye/Grounded Wye impedance values

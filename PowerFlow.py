@@ -1,7 +1,7 @@
 import math
 
 import numpy as np
-
+from Generator import Generator
 from System import System
 from TransmissionLine import TransmissionLine
 from VoltageMatrix import VoltageMatrix
@@ -33,10 +33,10 @@ class PowerFlow:
         self.J2 = None
         self.J3 = None
         self.J4 = None
+        self.Jacob = None
         self.busarr = None
         self.ybusarr = None
         self.xbusarr = None
-        self.printme = 0
         self.step1_y_array()
         self.step2_x_array_flatstart()
         self.Newton_Raphson()
@@ -45,7 +45,6 @@ class PowerFlow:
         #self.calcCurrent()
         #self.calcpower()
         #self.calc_power_loss()
-        print()
         #  fill y for power equation from bus information
 
     #finds the y... THIS WORKS AS EXPECTED
@@ -276,7 +275,6 @@ class PowerFlow:
     def Newton_Raphson(self):
         # 1. Set up y array for original P and Q values of all busses... not not in loop
 
-        print(self.printme)
         # 1. Set up y array based on inputs
         # 2. Set up flat start, set self.x voltage values and delta values to 1.o and 0.0, respectivly.. not in loop
         # 3. calculate power (find fx)
@@ -295,9 +293,7 @@ class PowerFlow:
         self.solveMismatch()
         if np.amax(abs(self.delta_y)) < self.tolerance:
             # self.x = self.x + self.delta_x
-            print(self.printme)
             return
-        self.printme += 1
         return self.Newton_Raphson()
 
     def getvalues(self):
@@ -305,6 +301,8 @@ class PowerFlow:
         i = 0
         slackS = 0
         for element_name, element in self.system.y_elements.items():
+            if isinstance(element, Generator):
+                continue
             # for row in element.buses:
             #  for col in element.buses:
             # index_row = self.system.buses[row].index

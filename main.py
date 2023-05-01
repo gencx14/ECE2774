@@ -1,7 +1,10 @@
 from System import System
 from Solution import Solution
+from DisplayResults import DisplayResults
 import Constants
 
+DisplayResults()
+'''
 system = System("system", 100e6, 230e3)
 system.add_geometry("geometry1", -19.5, 30, 0, 30, 19.5, 30)
 system.add_conductor("partridge", 0.642, 0.0217, 0.385, 460)
@@ -29,8 +32,9 @@ system.set_bus("bus7", "VC", 1.0, 0, 200, 0)
 
 
 
-Solution(system)
+# soln = Solution(system)
+DisplayResults(system, Solution(system))
 print()
-
+'''
 
 

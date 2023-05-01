@@ -24,6 +24,8 @@ class TransmissionLine:
         self.halfYshunt = self.totalYshunt / 2
         self.halfYshuntPu = self.halfYshunt / bases.ybase
         self.calc_y()
+        self.calc_y012()
+        self.calc_z012()
         self.zPu = self.zseriesPu
         self.currentOverRating = None
 

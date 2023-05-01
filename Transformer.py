@@ -17,6 +17,7 @@ class Transformer:
         self.data = tx_data
         self.zPu = self.data.zPu
         self.calc_y()
+        self.calc_ysequence()
 
     def calc_y(self):
         ypu_df = pd.DataFrame()
@@ -46,10 +47,10 @@ class Transformer:
         y2pu_df.loc[self.bus2, self.bus2] = self.data.y2
 
         # Calculate zero sequence element y bus
-        y0pu_df.loc[self.bus1, self.bus1] = self.data.y0
-        y0pu_df.loc[self.bus1, self.bus2] = -1 * self.data.y0
-        y0pu_df.loc[self.bus2, self.bus1] = -1 * self.data.y0
-        y0pu_df.loc[self.bus2, self.bus2] = self.data.y0
+        y0pu_df.loc[self.bus1, self.bus1] = self.data.y0aa
+        y0pu_df.loc[self.bus1, self.bus2] = -1 * self.data.y0ab
+        y0pu_df.loc[self.bus2, self.bus1] = -1 * self.data.y0ab
+        y0pu_df.loc[self.bus2, self.bus2] = self.data.y0bb
 
         #  Store the element y buses in the Transformer class
         self.y1 = y1pu_df

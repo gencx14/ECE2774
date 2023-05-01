@@ -1,7 +1,9 @@
+import pandas as pd
+from Bus import Bus
 class Generator:
     generator_count = 0
 
-    def __init__(self, name, voltage, bus1, x1, x2, x0, Zg):
+    def __init__(self, name, voltage, bus1: Bus, x1, x2, x0, Zg):
         self.name = name
         self.bus1 = bus1
         self.buses = [self.bus1]
@@ -16,6 +18,7 @@ class Generator:
         self.y0a = 1 / self.z0a
         self.y1a = 1 / self.z1a
         self.y2a = 1 / self.z2a
+        self.calc_ysequence()
         Generator.generator_count += 1
 
     def calc_ysequence(self):
@@ -25,21 +28,12 @@ class Generator:
 
         # calculate positive sequence element y bus
         y1pu_df.loc[self.bus1, self.bus1] = self.y1a
-        y1pu_df.loc[self.bus1, self.bus2] = 0
-        y1pu_df.loc[self.bus2, self.bus1] = 0
-        y1pu_df.loc[self.bus2, self.bus2] = 0
 
         # calculate negative sequence element y bus
         y2pu_df.loc[self.bus1, self.bus1] = self.y2a
-        y2pu_df.loc[self.bus1, self.bus2] = 0
-        y2pu_df.loc[self.bus2, self.bus1] = 0
-        y2pu_df.loc[self.bus2, self.bus2] = 0
 
         # Calculate zero sequence element y bus
-        y0pu_df.loc[self.bus1, self.bus1] = self.data.y0a
-        y0pu_df.loc[self.bus1, self.bus2] = 0
-        y0pu_df.loc[self.bus2, self.bus1] = 0
-        y0pu_df.loc[self.bus2, self.bus2] = 0
+        y0pu_df.loc[self.bus1, self.bus1] = self.y0a
 
         #  Store the element y buses in the Transformer class
         self.y1 = y1pu_df
