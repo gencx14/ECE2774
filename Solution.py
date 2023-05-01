@@ -7,9 +7,13 @@ class Solution:
         self.system = system
         self.ybusobj = YbusFormation(self.system)
         self.ybus = self.ybusobj.ymatrix
+        self.ybus0 = self.ybusobj.Ybus0
+        self.ybus1 = self.ybusobj.Ybus1
+        self.ybus2 = self.ybusobj.Ybus2
         self.bus_voltages = []
         self.pf = PowerFlow(self.ybus, self.system)
         self.Sequence = SequenceNetwork(self.system)
+        print()
 
     def do_power_flow(self):
         """

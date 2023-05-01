@@ -7,11 +7,14 @@ class YbusFormation:
 
     def __init__(self, system: System):
         self.system = system
-        self.ymatrix = None
         self.numBusses = len(self.system.buses)
         self.ymatrix = np.zeros((len(self.system.buses), len(self.system.buses)), dtype=complex) # creates an n by n matrix of 0s
+        self.Ybus1 = np.zeros((len(self.system.buses), len(self.system.buses)), dtype = complex)
+        self.Ybus2 = np.zeros((len(self.system.buses), len(self.system.buses)), dtype=complex)
+        self.Ybus0 = np.zeros((len(self.system.buses), len(self.system.buses)), dtype=complex)
         self.bus_order = list()
         self.fillYbus()
+        self.fillY012bus()
 
     def fillYbus(self):
         for element_name, element in self.system.y_elements.items():
@@ -27,14 +30,28 @@ class YbusFormation:
     def fillY012bus(self):
         for element_name, element in self.system.y_elements.items():
             for row in element.buses:
-                for col in element.buses:
-                    index_row = self.system.buses[row].index
-                    index_col = self.system.buses[col].index
+                index_row = self.system.buses[row].index
+                if isinstance(element, Generator):
+                    self.Ybus1[index_row, index_row] = self.Ybus1[index_row, index_row] + element.y1.loc[row, row]
+                    self.Ybus2[index_row, index_row] = self.Ybus2[index_row, index_row] + element.y2.loc[row, row]
+                    self.Ybus0[index_row, index_row] = self.Ybus0[index_row, index_row] + element.y0.loc[row, row]
+                    continue
+                else:
+                    for col in element.buses:
 
-                    self.Ybus1[index_row, index_row] = self.Ybus1[index_row, index_col] + element.y1.loc[row, col]
-                    self.Ybus2[index_row, index_col] = self.Ybus2[index_row, index_col] + element.y2.loc[row, col]
-                    self.Ybus0[index_row, index_col] = self.Ybus0[index_row, index_col] + element.y0.loc[row, col]
-                    
+                        # index_row = self.system.buses[row].index
+                        index_col = self.system.buses[col].index
+                        '''
+                        if isinstance(element, Generator):
+                            self.Ybus1[index_row, index_row] = self.Ybus1[index_row, index_col] + element.y1.loc[row, col]
+                            self.Ybus2[index_row, index_col] = self.Ybus2[index_row, index_col] + element.y2.loc[row, col]
+                            self.Ybus0[index_row, index_col] = self.Ybus0[index_row, index_col] + element.y0.loc[row, col]
+                        '''
+
+                        self.Ybus1[index_row, index_col] = self.Ybus1[index_row, index_col] + element.y1.loc[row, col]
+                        self.Ybus2[index_row, index_col] = self.Ybus2[index_row, index_col] + element.y2.loc[row, col]
+                        self.Ybus0[index_row, index_col] = self.Ybus0[index_row, index_col] + element.y0.loc[row, col]
+
 
 
 """"  This was my first attempt but the above method is much more succinct and brief
