@@ -34,6 +34,3 @@ system.set_bus("bus7", "VC", 1.0, 0, 200, 0)
 # soln = Solution(system)
 DisplayResults(system, Solution(system))
 print()
-
-
-
