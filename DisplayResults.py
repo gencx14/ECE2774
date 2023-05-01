@@ -1,12 +1,13 @@
 from Solution import Solution
 from System import System
 import pandas as pd
+from IPython.display import display
 from PowerFlow import PowerFlow
 
 class DisplayResults:
-    def __init__(self):
-        # self.system = system
-        # self.solution = solution
+    def __init__(self, system: System, solution: Solution):
+        self.system = system
+        self.solution = solution
         print("This code was designed for ECE 2774 and ECE 1774 by Nicholas Genco, Lucas Villaba, and Cole Florey.\n"
               "The course is led by Dr. Robert Kerestes and Paolo Radatz at the Universit of Pittsburgh.\n"
               "\n"
@@ -27,8 +28,15 @@ class DisplayResults:
               "\t\t\t       ** Subelements must be added prior to Transmission Lines and must be added in order of appearance\n"
               "\t   2. Transformer\n"
               "\t   3. Bus\n"
-              "\t   4. Generator\n\n")
-        self.build_system()
+              "\t   4. Generator\n\n"
+              "System is built with bus order being dictated by order of adding the bus to the system.\n"
+              f"Your current bus order is {list(self.system.buses.keys())}\n\n")
+        changebus = int(input("If you would like to reorder the buses before displaying results enter 1, otherwise enter 0: "))
+        while changebus < 0 or changebus > 1 or not isinstance(changebus, int):
+            changebus = int(input("Please enter 1 if you would like to reorder the bus display or 0 if you would not like to: "))
+
+
+        # self.build_system() This function is used for the full user interfaces that guides the user to build their own system step by step
         Ybus = pd.DataFrame(self.solution.ybus, columns=self.system.buses.keys())
         Ybus.index = self.system.buses.keys()
         Ybus1 = pd.DataFrame(self.solution.ybus1, columns = self.system.buses.keys())
@@ -37,12 +45,21 @@ class DisplayResults:
         Ybus2.index = self.system.buses.keys()
         Ybus0 = pd.DataFrame(self.solution.ybus0, columns = self.system.buses.keys())
         Ybus0.index = self.system.buses.keys()
+        new_order = input("Enter the new order of the index separated by spaces: ").split()
+        Ybus = Ybus.reindex(index=new_order, columns=new_order)
+        display(Ybus)
+        Ybus1 = Ybus1.reindex(index=new_order, columns=new_order)
+        Ybus2 = Ybus2.reindex(index=new_order, columns=new_order)
+        Ybus0 = Ybus0.reindex(index=new_order, columns=new_order)
 
+
+
+''' User interface still in development
     def build_system(self):
-        systemname = input("Please name your system name\n")
-        base
-        system_list = system.split()
-        system = System(system_list[0], float(system_list[1], float(system_list[2])))
+        systemname = input("Please name your system name: \n")
+        basepower = int(input("Please enter system base power (enter full number): \n"))
+        basevoltage = int(input("Please enter system base voltage (enter full number): \n"))
+        self.system = System(systemname, basepower, basevoltage)
 
         add = int(input("Which Element would you like to add first:\n"
                     "\t   1. Transmission Line\n"
@@ -63,6 +80,7 @@ class DisplayResults:
                 bund_string = ', '.join(list(self.system.bundles.keys()))
                 print("Adding a transmission line:\n"
                       "\t   1. Select or Add a Geometry (if you choose a new name a new geometry will be created)\n"
+                      "\t   2. Select or Add "
                       f"\t\t     Current Geometries: {geom_string}\n")
                 name = input("Enter Geometry Name: \n")
                 if name not in self.system.geometries:
@@ -78,14 +96,12 @@ class DisplayResults:
                 values = input(f"Please enter your {name} geometry configuration seperated by a space: \n"
                                    "\tInput Key: ax, ay, bx, by, cx, cy")
                 values_list = values.split()
-                values_list = float(values_list)
+                values_list = [float(v) for v in values_list]
                 self.system.add_geometry(name, *values_list)
 
+'''
 
 
-
-    def setBusses(self):
-        print()
 
 
 
