@@ -17,6 +17,11 @@ class Bus:
         self.qk = None
         Bus.busCount += 1
         self.type = type
+        # faulted will be used a flag to check if a bus is faulted or not
+        self.faulted = False
+        # fault_type is used to tell what type of fault exists, fault_type only matters if faulted = True
+        # 0 = symmetrical fault, 1 = single line-to-ground, 2 = line-to-line, 3 = double line-to-ground
+        self.fault_type = 0
         # self.getBusTypeCount()
 
     def getBusTypeCount(self):
