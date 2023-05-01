@@ -1,7 +1,7 @@
 from Solution import Solution
 from System import System
 import pandas as pd
-from IPython.display import display
+import numpy as np
 from PowerFlow import PowerFlow
 
 class DisplayResults:
@@ -45,12 +45,21 @@ class DisplayResults:
         Ybus2.index = self.system.buses.keys()
         Ybus0 = pd.DataFrame(self.solution.ybus0, columns = self.system.buses.keys())
         Ybus0.index = self.system.buses.keys()
-        new_order = input("Enter the new order of the index separated by spaces: ").split()
-        Ybus = Ybus.reindex(index=new_order, columns=new_order)
-        display(Ybus)
-        Ybus1 = Ybus1.reindex(index=new_order, columns=new_order)
-        Ybus2 = Ybus2.reindex(index=new_order, columns=new_order)
-        Ybus0 = Ybus0.reindex(index=new_order, columns=new_order)
+        if changebus == 1:
+            new_order = input("Enter the new order of the index separated by spaces: ").split()
+            Ybus = Ybus.reindex(index=new_order, columns=new_order)
+            Ybus1 = Ybus1.reindex(index=new_order, columns=new_order)
+            Ybus2 = Ybus2.reindex(index=new_order, columns=new_order)
+            Ybus0 = Ybus0.reindex(index=new_order, columns=new_order)
+        Ybus_formatted = Ybus.applymap(lambda c: f"({c.real:.3f} + {c.imag:.3f}j)")
+        Ybus1_formatted = Ybus1.applymap(lambda c: f"({c.real:.3f} + {c.imag:.3f}j)")
+        Ybus2_formatted = Ybus2.applymap(lambda c: f"({c.real:.3f} + {c.imag:.3f}j)")
+        Ybus0_formatted = Ybus0.applymap(lambda c: f"({c.real:.3f} + {c.imag:.3f}j)")
+
+
+        # PowerFlow
+        xlabels = np.array([self.solution.pf.xbusarr] [self.solution.pf.xbusarr])
+        powerflow_X = pd.DataFrame(self.solution.pf.x, )
 
 
 
