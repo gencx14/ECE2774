@@ -10,6 +10,12 @@ class Transformer:
         self.y1 = None
         self.y2 = None
         self.y0 = None
+        self.voltDrop = None
+        self.lineCurrent = None
+        self.powerLosses = None
+        self.powerSending_S = None
+        self.powerRecieving_S = None
+        self.currentOverRating = None
         self.name = name
         self.bus1 = bus1
         self.bus2 = bus2

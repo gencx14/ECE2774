@@ -9,6 +9,11 @@ class TransmissionLine:
         self.name = name
         self.bus1 = bus1
         self.bus2 = bus2
+       # self.voltDrop = None
+        self.lineCurrent = None
+        self.powerLosses = None
+        self.powerSending_S = None
+        self.powerRecieving_S = None
         self.y = None
         self.y0 = None
         self.y1 = None

@@ -8,6 +8,11 @@ class Generator:
         self.bus1 = bus1
         self.buses = [self.bus1]
         self.voltage = voltage
+        self.voltDrop = None
+        self.lineCurrent = None
+        self.powerLosses = None
+        self.powerSending_S = None
+        self.powerRecieving_S = None
         self.y0 = None
         self.y1 = None
         self.y2 = None
@@ -18,6 +23,7 @@ class Generator:
         self.y0a = 1 / self.z0a
         self.y1a = 1 / self.z1a
         self.y2a = 1 / self.z2a
+        self.currentOverRating = None
         self.calc_ysequence()
         Generator.generator_count += 1
 
