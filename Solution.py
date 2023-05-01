@@ -1,5 +1,6 @@
 from System import System
 from YbusFormation import YbusFormation
+from ZbusFormation import ZbusFormation
 from PowerFlow import PowerFlow
 from SequenceNetwork import SequenceNetwork
 class Solution:
@@ -12,7 +13,12 @@ class Solution:
         self.ybus2 = self.ybusobj.Ybus2
         self.bus_voltages = []
         self.pf = PowerFlow(self.ybus, self.system)
-        self.Sequence = SequenceNetwork(self.system)
+        self.zbusobj = ZbusFormation(self.system, self.ybusobj)
+        self.zbus = self.zbusobj.Zbus
+        self.zbus1 = self.zbusobj.Zbus1
+        self.zbus2 = self.zbusobj.Zbus2
+        self.zbus0 = self.zbusobj.Zbus0
+        # self.Sequence = SequenceNetwork(self.system)
         print()
 
 

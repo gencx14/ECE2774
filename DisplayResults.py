@@ -1,5 +1,6 @@
 from Solution import Solution
 from System import System
+from Generator import Generator
 import pandas as pd
 import numpy as np
 import cmath
@@ -46,6 +47,14 @@ class DisplayResults:
         Ybus2.index = self.system.buses.keys()
         Ybus0 = pd.DataFrame(self.solution.ybus0, columns = self.system.buses.keys())
         Ybus0.index = self.system.buses.keys()
+        Zbus = pd.DataFrame(self.solution.zbus, columns=self.system.buses.keys())
+        Zbus.index = self.system.buses.keys()
+        Zbus1 = pd.DataFrame(self.solution.zbus1, columns=self.system.buses.keys())
+        Zbus1.index = self.system.buses.keys()
+        Zbus2 = pd.DataFrame(self.solution.zbus2, columns=self.system.buses.keys())
+        Zbus2.index = self.system.buses.keys()
+        Zbus0 = pd.DataFrame(self.solution.zbus0, columns=self.system.buses.keys())
+        Zbus0.index = self.system.buses.keys()
         pfbusarr = np.concatenate((np.array(list(self.system.buses.keys())), np.array(list(self.system.buses.keys()))))
         powerflow_X = pd.DataFrame(self.solution.pf.x, index=pfbusarr)
         powerflow_Y = pd.DataFrame(self.solution.pf.y, index=pfbusarr)
@@ -59,6 +68,10 @@ class DisplayResults:
             Ybus1 = Ybus1.reindex(index=new_order, columns=new_order)
             Ybus2 = Ybus2.reindex(index=new_order, columns=new_order)
             Ybus0 = Ybus0.reindex(index=new_order, columns=new_order)
+            Zbus = Zbus.reindex(index=new_order, columns=new_order)
+            Zbus1 = Zbus1.reindex(index=new_order, columns=new_order)
+            Zbus2 = Zbus2.reindex(index=new_order, columns=new_order)
+            Zbus0 = Zbus0.reindex(index=new_order, columns=new_order)
             powerflow_X = powerflow_X.reindex(index=pfbusarr)
             powerflow_Y = powerflow_Y.reindex(index=pfbusarr)
 
@@ -70,13 +83,40 @@ class DisplayResults:
 
         print(f"The has {len(self.system.y_elements)} elements and {len(self.system.buses)} busses.\n")
         for elementName,element in self.system.y_elements.items():
-
+            if isinstance(element, Generator):
+                print(f"The {elementName} information was not included\n")
+                continue
             print(f" {elementName}, has the following values.\n"
                   f"\t  The Voltage drop across the {elementName} is {abs(self.system.y_elements[elementName].voltDrop) * self.system.bases.vbase}.\n"
                   f"\t  The Line Current is {abs(self.system.y_elements[elementName].lineCurrent) * self.system.bases.ibase} Amps. Is the system overcurrent: {element.currentOverRating}\n"
                   f"\t  The powerLosses in the line is {np.real(self.system.y_elements[elementName].powerLosses) * self.system.bases.pbase}. \n"
                   f"\t  The powerSending from {element.bus1} is {self.system.y_elements[elementName].powerSending_S * 3 * self.system.bases.pbase}.\n"
                   f"\t  The power being Recieved by {element.bus2} is {self.system.y_elements[elementName].powerSending_S * 3 * self.system.bases.pbase}.\n\n")
+
+
+
+        print(f"Y Bus:\n {Ybus}\n\n"
+              f"Ybus0:\n {Ybus0}\n\n"
+              f"Ybus1:\n {Ybus1}\n\n"
+              f"Ybus2:\n {Ybus2}\n\n"
+              f"Z Bus:\n {Zbus}\n\n"
+              f"Zbus0:\n {Zbus0}\n\n"
+              f"Zbus1:\n {Zbus1}\n\n"
+              f"Zbus2:\n {Zbus2}\n\n"
+              f"X array [delta in rads, voltage]:\n {powerflow_X}\n\n"
+              f"Y array [P in per unit, Q in per unit]:\n {powerflow_Y}\n\n"
+              f"Jacobian:\n {Jacobian}\n\n")
+        self.Ybus = Ybus
+        self.Ybus0 = Ybus0
+        self.Ybus1 = Ybus1
+        self.Ybus2 = Ybus2
+        self.Zbus = Zbus
+        self.Zbus0 = Zbus0
+        self.Zbus1 = Zbus1
+        self.Zbus2 = Zbus2
+
+
+
 
 
 
