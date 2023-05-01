@@ -25,6 +25,8 @@ class System:
         self.Vmatrix = None
         self.Imatrix = None
         self.Smatrix = None
+        self.Plosses = None
+        self.totlaPloss = None
         self.bases = BaseValues(pbase, vbase)  # check on this if it gets messed up.
         # makes a list of the bus order and ensures that they are entered as strings
         self.buses_order: List[str] = list()
@@ -64,10 +66,11 @@ class System:
 
     def add_generator(self, name, voltage, bus1, x1, x2, x0, Zg):
         if name not in self.generatorItems.keys():
-            self.generatorItems[name] = Generator(name, voltage, bus1, x1, x2, x0, Zg)
+            self.gen = Generator(name, voltage, bus1, x1, x2, x0, Zg)
+            self.generatorItems[name] = self.gen
             self.add_bus(bus1)
             self.buses[bus1].vk = voltage
-            self.y_elements[name] = self.generatorItems[name]
+            self.y_elements[name] = self.gen
             System.componentCount += 1
 
     def add_conductor(self, name, outerDiameter, gmr, rAC, ampacity):
@@ -85,8 +88,9 @@ class System:
 
     def add_transformer(self, name: str, bus1, bus2, txData: TransformerData):
         if name not in self.transformers.keys():
-            self.transformers[name] = Transformer(name, bus1, bus2, txData)
-            self.y_elements[name] = Transformer(name, bus1, bus2, txData)
+            self.tx1 = Transformer(name, bus1, bus2, txData)
+            self.transformers[name] = self.tx1
+            self.y_elements[name] = self.tx1
             self.add_bus(bus1)
             self.add_bus(bus2)
             System.componentCount += 1
@@ -98,8 +102,9 @@ class System:
 
     def add_transmissionLine(self, name: str, bus1, bus2, lineData: TransmissionLineData, length):
         if name not in self.transmissionlines.keys():
-            self.transmissionlines[name] = TransmissionLine(name, bus1, bus2, lineData, length, self.bases)
-            self.y_elements[name] = TransmissionLine(name, bus1, bus2, lineData, length, self.bases)
+            self.tline = TransmissionLine(name, bus1, bus2, lineData, length, self.bases)
+            self.transmissionlines[name] = self.tline
+            self.y_elements[name] = self.tline
             self.add_bus(bus1)
             self.add_bus(bus2)
             System.componentCount += 1

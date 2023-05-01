@@ -2,6 +2,7 @@ from Solution import Solution
 from System import System
 import pandas as pd
 import numpy as np
+import cmath
 from PowerFlow import PowerFlow
 
 class DisplayResults:
@@ -45,25 +46,63 @@ class DisplayResults:
         Ybus2.index = self.system.buses.keys()
         Ybus0 = pd.DataFrame(self.solution.ybus0, columns = self.system.buses.keys())
         Ybus0.index = self.system.buses.keys()
+        pfbusarr = np.concatenate((np.array(list(self.system.buses.keys())), np.array(list(self.system.buses.keys()))))
+        powerflow_X = pd.DataFrame(self.solution.pf.x, index=pfbusarr)
+        powerflow_Y = pd.DataFrame(self.solution.pf.y, index=pfbusarr)
+        JacobIndex = np.array([bus.name for bus in self.solution.pf.tiebusses])
+        Jacobian = pd.DataFrame(self.solution.pf.Jacob, index=JacobIndex, columns=JacobIndex)
+        print('NOTICE: JACOBIAN, Power Flow X and Y order is NOT RECONFIGURABLE and user should take attention to understand what value they are looking at\n')
         if changebus == 1:
             new_order = input("Enter the new order of the index separated by spaces: ").split()
+            pfbussarr = new_order[:7] + new_order[:7]
             Ybus = Ybus.reindex(index=new_order, columns=new_order)
             Ybus1 = Ybus1.reindex(index=new_order, columns=new_order)
             Ybus2 = Ybus2.reindex(index=new_order, columns=new_order)
             Ybus0 = Ybus0.reindex(index=new_order, columns=new_order)
+            powerflow_X = powerflow_X.reindex(index=pfbusarr)
+            powerflow_Y = powerflow_Y.reindex(index=pfbusarr)
+
         Ybus_formatted = Ybus.applymap(lambda c: f"({c.real:.3f} + {c.imag:.3f}j)")
         Ybus1_formatted = Ybus1.applymap(lambda c: f"({c.real:.3f} + {c.imag:.3f}j)")
         Ybus2_formatted = Ybus2.applymap(lambda c: f"({c.real:.3f} + {c.imag:.3f}j)")
         Ybus0_formatted = Ybus0.applymap(lambda c: f"({c.real:.3f} + {c.imag:.3f}j)")
 
 
-        # PowerFlow
-        xlabels = np.array([self.solution.pf.xbusarr] [self.solution.pf.xbusarr])
-        powerflow_X = pd.DataFrame(self.solution.pf.x, )
+        print(f"The has {len(self.system.y_elements)} elements and {len(self.system.buses)} busses.\n")
+        for elementName,element in self.system.y_elements.items():
+
+            print(f" {elementName}, has the following values.\n"
+                  f"\t  The Voltage drop across the {elementName} is {abs(self.system.y_elements[elementName].voltDrop) * self.system.bases.vbase}.\n"
+                  f"\t  The Line Current is {abs(self.system.y_elements[elementName].lineCurrent) * self.system.bases.ibase} Amps. Is the system overcurrent: {element.currentOverRating}\n"
+                  f"\t  The powerLosses in the line is {np.real(self.system.y_elements[elementName].powerLosses) * self.system.bases.pbase}. \n"
+                  f"\t  The powerSending from {element.bus1} is {self.system.y_elements[elementName].powerSending_S * 3 * self.system.bases.pbase}.\n"
+                  f"\t  The power being Recieved by {element.bus2} is {self.system.y_elements[elementName].powerSending_S * 3 * self.system.bases.pbase}.\n\n")
 
 
 
-''' User interface still in development
+'''
+            new_Jacobindex = []
+            for i in new_order:
+                if i in Jacobian.index:
+                    new_Jacobindex.append(i)
+            Jacobian1 = Jacobian.iloc[:len(new_Jacobindex), :len(new_Jacobindex)]
+            Jacobian1 = Jacobian.reindex(index=new_Jacobindex, columns=new_Jacobindex)
+            halflength = len(new_Jacobindex)
+            for i in new_order:
+                if i in Jacobian.index[halflength:]:
+                    new_Jacobindex.append(i + ' a')
+            Jacobian = Jacobian.reindex(index=new_Jacobindex[halflength+1:len(new_Jacobindex)], columns=new_Jacobindex[halflength:len(new_Jacobindex)])
+'''
+
+
+
+
+
+
+
+
+'''
+ User interface still in development
     def build_system(self):
         systemname = input("Please name your system name: \n")
         basepower = int(input("Please enter system base power (enter full number): \n"))

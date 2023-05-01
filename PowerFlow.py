@@ -37,6 +37,7 @@ class PowerFlow:
         self.busarr = None
         self.ybusarr = None
         self.xbusarr = None
+        self.tiebusses = None
         self.step1_y_array()
         self.step2_x_array_flatstart()
         self.Newton_Raphson()
@@ -215,6 +216,7 @@ class PowerFlow:
         dy = np.zeros(2 * self.N, dtype=float)
 
         tiebusses = np.zeros(2 * len(self.system.buses), dtype=object)
+        self.tiebusses = np.zeros(2 * len(self.system.buses), dtype=object)
         n = 0
         for bus in self.system.buses:
             tiebusses[n] = self.system.buses[bus]
@@ -237,6 +239,7 @@ class PowerFlow:
                 self.Jacob = np.delete(arr=self.Jacob, obj=n + self.N, axis = 1)
                 self.delta_y = np.delete(arr=self.delta_y, obj=n+self.N)
                 tiebusses = np.delete(arr=tiebusses, obj=n+self.N)
+        self.tiebusses = tiebusses
 
 
         self.delta_x = np.dot(np.linalg.inv(self.Jacob), self.delta_y)
